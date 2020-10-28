@@ -1,5 +1,5 @@
 image:
-  repository: cmssw/rucio-daemons
+  repository: rucio/rucio-daemons
 
 abacusAccountCount: 1
 abacusRseCount: 1
@@ -43,8 +43,7 @@ ftsRenewal:
   image:
     repository: rucio/fts-cron
     tag: latest
-  voms: "cms:/cms/Role=production"
-  servers: "https://fts3-devel.cern.ch:8446,https://cmsfts3.fnal.gov:8446,https://fts3.cern.ch:8446,https://lcgfts3.gridpp.rl.ac.uk:8446,https://fts3-pilot.cern.ch:8446"
+  servers: "https://fts01.pic.es:8446"
 
 hermes:
     useSSL: 1
@@ -95,22 +94,18 @@ config:
         loglevel: "INFO"
     messaging_hermes:
         port: "61323"
-        brokers: "cms-mb.cern.ch"
+        brokers: "pic-mb.cern.ch"
         ssl_key_file: "/opt/rucio/keys/new_userkey.pem"
         ssl_cert_file: "/opt/rucio/certs/usercert.pem"
-        destination: "/topic/cms.rucio.events"
-        voname: "cms"
+        destination: "/topic/pic.rucio.events"
     monitor:
       enable_metrics: "True"
       metrics_port: "8080"
     tracer_kronos:
-        username: "cmsrucio"
+        username: "picrucio"
         port: "61313"
-        brokers: "cms-mb.cern.ch"
-        queue: "/queue/Consumer.kronos.cms.rucio.tracer"
-#    # Until 1.21.9
-#    tracer:
-#        queue: "/queue/Consumer.kronos.cms.rucio.tracer"
+        brokers: "pic-mb.cern.ch"
+        queue: "/queue/Consumer.kronos.pic.rucio.tracer"
 
 transmogrifierResources:
     requests:

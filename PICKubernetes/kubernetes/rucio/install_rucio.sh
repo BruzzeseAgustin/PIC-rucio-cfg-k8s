@@ -9,7 +9,7 @@ export ENTITY=pic
 export INSTANCE=v1
 
 export SERVER_NAME=pic-rucio-${INSTANCE}
-export DAEMON_NAME=pic-dameon-${INSTANCE}
+export DAEMON_NAME=pic-daemon-${INSTANCE}
 export UI_NAME=pic-webui-${INSTANCE}
 
 # Ingress server. With correct labels in create_cluster.sh we should not need this anymore. Commenting out
@@ -17,7 +17,7 @@ export UI_NAME=pic-webui-${INSTANCE}
 
 # Rucio server, daemons, and daemons for analysis
 
-helm install $SERVER_NAME --values pic-rucio-common.yaml,pic-rucio-server.yaml,pic-rucio-server.yaml,${INSTANCE}-db.yaml rucio/rucio-server
-helm install $DAEMON_NAME --values pic-rucio-common.yaml,pic-rucio-daemons.yaml,pic-rucio-daemons.yaml,${INSTANCE}-db.yaml rucio/rucio-daemons
-helm install $UI_NAME --values pic-rucio-common.yaml,pic-rucio-webui.yaml,pic-rucio-webui.yaml,${INSTANCE}-db.yaml rucioO/rucio-ui
+helm install $SERVER_NAME --values pic-rucio-common.yaml,pic-rucio-server.yaml rucio/rucio-server
+helm install $DAEMON_NAME --values pic-rucio-common.yaml,pic-rucio-daemons.yaml rucio/rucio-daemons
+helm install $UI_NAME --values pic-rucio-common.yaml,pic-rucio-webui.yaml rucio/rucio-ui
 
