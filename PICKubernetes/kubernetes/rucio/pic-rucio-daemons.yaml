@@ -1,0 +1,144 @@
+image:
+  repository: cmssw/rucio-daemons
+
+abacusAccountCount: 1
+abacusRseCount: 1
+#conveyorTransferSubmitterCount: 2
+conveyorTransferSubmitterCount: 3
+conveyorPollerCount: 2
+conveyorFinisherCount: 2
+hermesCount: 1
+judgeCleanerCount: 1
+judgeEvaluatorCount: 1
+judgeInjectorCount: 1
+judgeRepairerCount: 1
+tracerKronosCount: 1
+transmogrifierCount: 1
+undertakerCount: 1
+reaperCount: 0
+reaper2Count: 1
+minosCount: 1
+necromancerCount: 1
+
+abacusRse:
+  threads: 2
+
+reaper2:
+  greedy: 1
+  threads: 8
+  resources:
+    requests:
+      memory: 750Mi
+    limits:
+      memory: 1000Gi
+
+conveyorTransferSubmitter:
+    activities: "'Data Brokering' 'Data rebalancing' 'Debug' 'Express' 'Functional Test' 'Group Subscriptions' 'Production Input' 'Production Output' 'Analysis Input' 'Analysis Output' 'Staging' 'T0 Export' 'T0 Tape' 'Upload/Download (Job)' 'Upload/Download (User)' 'User Subscriptions'"
+    # Same size or smaller than bulk which is 100
+    groupBulk: 50
+
+# Settings to renew FTS	proxy
+ftsRenewal:
+  enabled: 1
+  image:
+    repository: rucio/fts-cron
+    tag: latest
+  voms: "cms:/cms/Role=production"
+  servers: "https://fts3-devel.cern.ch:8446,https://cmsfts3.fnal.gov:8446,https://fts3.cern.ch:8446,https://lcgfts3.gridpp.rl.ac.uk:8446,https://fts3-pilot.cern.ch:8446"
+
+hermes:
+    useSSL: 1
+    threads: 5
+    bulk: 500
+    brokerTimeout: 120
+
+judgeEvaluator: 
+  resources:
+    limits:
+      cpu: 3750m 
+    requests:
+      cpu: 750m 
+
+judgeCleaner:
+  threads: 2
+  resources:
+    limits:
+      cpu: 3750m 
+      memory: 4000Mi
+    requests:
+      cpu: 750m 
+      memory: 400Mi
+
+judgeInjector:
+  threads: 2
+  resources:
+    limits:
+      cpu: 3750m 
+      memory: 8000Mi
+    requests:
+      cpu: 750m 
+      memory: 400Mi
+
+judgeRepairer:
+  resources:
+    limits:
+      cpu: 3750m 
+    requests:
+      cpu: 750m 
+
+monitoring:
+  enabled: true
+  serviceMonitorEnabled: false
+
+config:
+    common:
+        loglevel: "INFO"
+    messaging_hermes:
+        port: "61323"
+        brokers: "cms-mb.cern.ch"
+        ssl_key_file: "/opt/rucio/keys/new_userkey.pem"
+        ssl_cert_file: "/opt/rucio/certs/usercert.pem"
+        destination: "/topic/cms.rucio.events"
+        voname: "cms"
+    monitor:
+      enable_metrics: "True"
+      metrics_port: "8080"
+    tracer_kronos:
+        username: "cmsrucio"
+        port: "61313"
+        brokers: "cms-mb.cern.ch"
+        queue: "/queue/Consumer.kronos.cms.rucio.tracer"
+#    # Until 1.21.9
+#    tracer:
+#        queue: "/queue/Consumer.kronos.cms.rucio.tracer"
+
+transmogrifierResources:
+    requests:
+      memory: 200Mi
+    limits:
+      memory: 1450Mi
+
+tracerKronos:
+  resources:
+    limits:
+      cpu: 3000m 
+    requests:
+      cpu: 1000m 
+  
+abacusAccount:
+    resources:
+      limits:
+        cpu: 700m
+        memory: 2000Mi
+      requests:
+        cpu: 700m
+        memory: 250Mi
+
+abacusRse:
+    resources:
+      limits:
+        cpu: 700m
+        memory: 4000Mi
+      requests:
+        cpu: 700m
+        memory: 900Mi
