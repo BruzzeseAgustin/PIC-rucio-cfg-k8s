@@ -1,0 +1,14 @@
+image:
+  registry: docker.io
+  repository: bitnami/postgresql
+  tag: 12
+
+postgresqlUsername: rucio
+
+postgresqlPassword: secret
+
+postgresqlDatabase: rucio
+
+persistence:
+  enabled: false
+
