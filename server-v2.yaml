@@ -52,6 +52,23 @@ authIngress:
   tls:
     - secretName: rucio-server.tls-secret
 
+resources:
+  requests:
+    memory: 2500Mi
+  limits:
+    memory: 2500Mi
+
+additionalSecrets:
+  policy:
+    secretName: permission
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/core/permission/pic.py
+    subPath: pic.py
+  schema:
+    secretName: schema
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/common/schema/pic.py
+    subPath: pic.py
+
+
 config:
   database:
     default: "postgresql://rucio:secret@postgres-postgresql/rucio"
@@ -59,10 +76,7 @@ config:
   policy:
     # config.permission.policy: (default "generic")
     # permission: "generic"
-    permission: "pic-policy"
+    # schema: "generic"
+    permission: "pic"
+    schema: "pic"
 
-additionalSecrets:
-  policy:
-    secretName: policy
-    mountPath: /usr/local/lib/python3.6/site-packages/rucio/common/schema/pic-policy.py
-    subPath: pic-policy.py

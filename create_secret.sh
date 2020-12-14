@@ -71,4 +71,5 @@ kubectl create secret generic ${UI_NAME}-hostcert --from-file=hostcert.pem=/$(pw
 kubectl create secret generic ${UI_NAME}-hostkey --from-file=hostkey.pem=/$(pwd)/host-cert-k8s-v2/hostkey.pem
 kubectl create secret generic ${UI_NAME}-cafile --from-file=ca.pem=/etc/grid-security/certificates/GEANTeScienceSSLCA4.pem
 
-kubectl create secret generic pic01-policy --from-file=pic-policy.py=/$(pwd)/policy/pic.py
+kubectl create secret generic pic01-permission --from-file=pic.py=/$(pwd)/permission/pic.py
+kubectl create secret generic pic01-schema --from-file=pic.py=/$(pwd)/schema/pic.py

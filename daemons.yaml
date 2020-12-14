@@ -1,5 +1,6 @@
 abacusAccountCount: 1
 abacusRseCount: 1
+abacusCollectionReplicaCount: 1
 conveyorTransferSubmitterCount: 3
 conveyorPollerCount: 2
 conveyorFinisherCount: 2
@@ -26,6 +27,16 @@ abacusAccount:
     limits:
       memory: "256Mi"
       cpu: "50m"
+
+abacusCollectionReplica:
+  threads: 1
+  resources:
+    limits:
+      memory: "200Mi"
+      cpu: "700m"
+    requests:
+      memory: "200Mi"
+      cpu: "700m"
 
 abacusRse:
   threads: 1
