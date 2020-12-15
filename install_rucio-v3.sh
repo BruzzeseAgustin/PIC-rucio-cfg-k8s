@@ -13,7 +13,7 @@ then
     helm delete daemons 
 fi
 
-./create_secret.sh
+./create_secret-v2.sh
 
 helm install postgres bitnami/postgresql -f postgres_values.yaml
 PSQL_POD=$(kubectl get pods postgres-postgresql-0 -n prod-rucio-test | grep "Running" | awk '{print $3}')
@@ -25,6 +25,7 @@ done
 
 helm install pic01 rucio/rucio-server -f server-v2.yaml
 helm install daemons rucio/rucio-daemons -f daemons.yaml
+helm install web rucio/rucio-ui -f web-ui.yaml 
 kubectl create job renew-manual-1 --from=cronjob/daemons-renew-fts-proxy
 
 git clone https://github.com/pic-es/cronjobs.git
@@ -39,6 +40,18 @@ INIT_POD=$(kubectl get pods test-init -n prod-rucio-test | grep "Completed" | aw
 while [[ $INIT_POD != "Completed" ]]; do 
   echo 'Iniciating rucio db with basic user...' && INIT_POD=$(kubectl get pods test-init -n prod-rucio-test | grep "Completed" | awk '{print $3}')  && CR_STATE=$(kubectl get pods test-init -n prod-rucio-test | awk '{print $3}') && echo "Current state is $CR_STATE" && sleep 1;
 done
+
+SERVER_POD=$(kubectl get deployment pic01-rucio-server | tail -n +2 | awk '{print $4}')
+AUTH_POD=$(kubectl get deployment pic01-rucio-server-auth | tail -n +2 | awk '{print $4}')
+
+SERVER_POD=$(kubectl get deployment pic01-rucio-server | tail -n +2 | awk '{print $4}')
+AUTH_POD=$(kubectl get deployment pic01-rucio-server-auth | tail -n +2 | awk '{print $4}')
+
+
+while [[ $SERVER_POD != 1 || $AUTH_POD != 1 ]]; do
+  echo 'Iniciating rucio server and auth service...' && SERVER_POD=$(kubectl get deployment pic01-rucio-server | tail -n +2 | awk '{print $4}')  && AUTH_POD=$(kubectl get deployment pic01-rucio-server-auth | awk '{print $2}') && echo 'Current state is for server and auth are ' $CR_STATE_S $CR_STATE_A ' respecively' && sleep 1;
+done
+
 
 kubectl create -f cronjobs/rucio-sync-rses/kubernetes/deployment.yaml 
 kubectl create -f cronjobs/rucio-sync-clients/kubernetes/deployment.yaml

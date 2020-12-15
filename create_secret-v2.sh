@@ -2,7 +2,7 @@
 
 
 kubectl create secret tls rucio-server.tls-secret --key=host-cert-k8s-v3/hostkey.pem --cert=host-cert-k8s-v3/hostcert.pem
-kubectl create secret tls rucio-web.tls-secret --key=host-cert-k8s-v3/hostkey.pem --cert=host-cert-k8s-v3/hostcert.pem
+kubectl create secret tls rucio-web.tls-secret --key=host-cert-web-v1/hostkey.pem --cert=host-cert-web-v1/hostcert.pem
 
 kubectl create secret generic pic01-server-hostcert --from-file=hostcert.pem=/$(pwd)/host-cert-k8s-v3/hostcert.pem
 kubectl create secret generic pic01-server-hostkey --from-file=hostkey.pem=/$(pwd)/host-cert-k8s-v3/hostkey.pem
@@ -71,13 +71,12 @@ kubectl create secret generic web-certs --from-file=/tmp/user-certs/
 rm -rf /tmp/user-certs
 
 export UI_NAME=web
-kubectl create secret generic ${UI_NAME}-hostcert --from-file=hostcert.pem=/$(pwd)/host-cert-k8s-v3/hostcert.pem
-kubectl create secret generic ${UI_NAME}-hostkey --from-file=hostkey.pem=/$(pwd)/host-cert-k8s-v3/hostkey.pem
+kubectl create secret generic ${UI_NAME}-hostcert --from-file=hostcert.pem=/$(pwd)/host-cert-web-v1/hostcert.pem
+kubectl create secret generic ${UI_NAME}-hostkey --from-file=hostkey.pem=/$(pwd)/host-cert-web-v1/hostkey.pem
 kubectl create secret generic ${UI_NAME}-cafile --from-file=ca.pem=/etc/grid-security/certificates/GEANTeScienceSSLCA4.pem
 
 kubectl create secret generic pic01-permission --from-file=pic.py=/$(pwd)/permission/pic.py
 kubectl create secret generic pic01-schema --from-file=pic.py=/$(pwd)/schema/pic.py
 
-kubectl create secret generic pic01-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-k8s-v3/usercert_with_key.pem
-kubectl create secret generic web-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-k8s-v3/usercert_with_key.pem
-
+kubectl create secret generic pic01-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v1/usercert_with_key.pem
+kubectl create secret generic web-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v1/usercert_with_key.pem

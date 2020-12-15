@@ -1,8 +1,8 @@
 image:
   repository: rucio/rucio-server
-  tag: release-1.23.8_py3
-  # tag: release-1.23.8
-  pullPolicy: Never
+  tag: release-1.23.11_py3
+  # tag: release-1.23.8_py3
+  # pullPolicy: Never
 
 # For NGINX ingress. Eventually becomes plain server
 replicaCount: 1
@@ -67,7 +67,10 @@ additionalSecrets:
     secretName: schema
     mountPath: /usr/local/lib/python3.6/site-packages/rucio/common/schema/pic.py
     subPath: pic.py
-
+  usercert:
+    secretName: usercert-with-key
+    mountPath: /opt/rucio/etc/usercert_with_key.pem
+    subPath: usercert_with_key.pem
 
 config:
   database:
@@ -79,4 +82,7 @@ config:
     # schema: "generic"
     permission: "pic"
     schema: "pic"
+  webui:
+    ## config.webui.usercert:  (default "/opt/rucio/etc/usercert_with_key.pem")
+    usercert: "/opt/rucio/etc/usercert_with_key.pem"
 

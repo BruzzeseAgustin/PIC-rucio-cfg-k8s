@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-open(FD, "pic01-rucio-server_pic_es.cer");
+open(FD, "pic01-rucio-server-web_pic_es.cer");
 
 while (<FD>) {
     $aux.=$_;
