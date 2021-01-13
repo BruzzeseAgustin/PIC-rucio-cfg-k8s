@@ -1,0 +1,26 @@
+FROM rucio/rucio-clients:release-1.24.1
+
+USER root
+
+# EGI trust anchors
+RUN curl -o /etc/yum.repos.d/EGI-trustanchors.repo http://repository.egi.eu/sw/production/cas/1/current/repo-files/EGI-trustanchors.repo \
+    && yum -y update
+
+RUN yum -y install wget
+RUN yum -y install ca-certificates ca-policy-egi-core
+RUN yum -y install nano 
+
+# PIC Rucio setup
+ADD config/rucio.cfg.pic.j2 /opt/user/rucio.cfg.j2
+
+COPY config/bashrc /root/.bashrc
+
+RUN yum clean metadata
+
+# Add a non-privileged user
+# RUN useradd --create-home --skel /dev/null user
+
+USER user
+WORKDIR /opt/
+
+CMD ["/usr/sbin/init", "/bin/bash"]

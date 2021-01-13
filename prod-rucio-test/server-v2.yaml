@@ -1,13 +1,14 @@
 image:
   repository: rucio/rucio-server
-  tag: release-1.23.11_py3
+  tag: release-1.24.1
+  # tag: release-1.23.11_py3
   # tag: release-1.23.8_py3
   # pullPolicy: Never
 
 # For NGINX ingress. Eventually becomes plain server
 replicaCount: 1
 authReplicaCount: 1
-traceReplicaCount: 1
+traceReplicaCount: 0
 
 exposeErrorLogs:
   server: True
@@ -20,16 +21,38 @@ strategy:
     maxSurge: 1
     maxUnavailable: 1
 
+automaticRestart:
+  enabled: 1
+  image:
+    repository: bitnami/kubectl
+    tag: 1.18
+    pullPolicy: IfNotPresent
+  schedule: "5 1 * * *"
+
 # Use http worker mode and elsewhere configure database connections for Oracle Database Resident Connection Pool (DRCP)
 httpd_config:
   encoded_slashes: "True"
+  mpm_mode: "event"
+  enable_status: "True"
+  keep_alive: "On"
+  keep_alive_timeout: "5"
+  max_keep_alive_requests: "128"
+  server_limit: "10"
+  start_servers: "4"
+  thread_limit: "128"
+  threads_per_child: "128"
+  min_spare_threads: "256"
+  max_spare_threads: "512"
+  max_request_workers: "1280"
+  max_connections_per_child: "2048"
 
 ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/frontend-entry-points: http, https
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   hosts:
     - pic01-rucio-server.pic.es
   tls: 
@@ -44,8 +67,10 @@ authIngress:
   enabled: true
   annotations: 
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/frontend-entry-points: http, https
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    #nginx.ingress.kubernetes.io/frontend-entry-points: http, https
+    #nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
   path:
   hosts: 
     - pic01-rucio-server-auth.pic.es
@@ -82,7 +107,14 @@ config:
     # schema: "generic"
     permission: "pic"
     schema: "pic"
+    lfn2pfn_algorithm_default: "identity" 
   webui:
     ## config.webui.usercert:  (default "/opt/rucio/etc/usercert_with_key.pem")
     usercert: "/opt/rucio/etc/usercert_with_key.pem"
+
+
+nodeSelector:
+  {}
+  # node: rucioui
+  # node: rucio
 

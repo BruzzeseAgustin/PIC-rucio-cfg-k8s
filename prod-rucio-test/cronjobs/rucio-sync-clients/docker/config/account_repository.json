@@ -1,0 +1,49 @@
+{ 
+ "eplanas": {
+  "email": null, 
+  "USERPASS": [
+   "eplanas", "pwd123"
+  ]
+ }, 
+ "rcruz": {
+  "email": null, 
+  "USERPASS": [
+   "rcruz", "pwd123"
+ ]
+ }, 
+ "jdelgado": {
+  "USERPASS": [
+   "jdelgado", "pwd123"
+ ]
+ }, 
+ "root": {
+  "email": null, 
+  "x509": [
+   "/DC=org/DC=terena/DC=tcs/C=ES/O=Port dInformacio Cientifica/CN=Agustin Bruzzese bruzzese@pic.es", 
+   "/DC=org/DC=terena/DC=tcs/C=ES/L=Cerdanyola del Valles/O=Institut de Fisica d. Altes Energies/CN=rucio03.pic.es", 
+   "/DC=org/DC=terena/DC=tcs/C=ES/L=Cerdanyola del Valles/O=Institut de Fisica d. Altes Energies/CN=pic01-rucio-server.pic.es"
+  ],
+  "USERPASS": [
+   "ddmlab", "pwd123"
+ ]
+ }, 
+ "ptallada": {
+  "USERPASS": [
+   "ptallada", "pwd123"
+ ]
+ }, 
+ "abruzzese": {
+  "x509": [
+   "/DC=org/DC=terena/DC=tcs/C=ES/O=Port dInformacio Cientifica/CN=Agustin Bruzzese bruzzese@pic.es"
+  ],
+  "USERPASS": [
+   "abruzzese", "pwd123"
+ ]
+ }, 
+ "gmerino": {
+  "email": null, 
+  "USERPASS": [
+   "gmerino", "pwd123"
+ ]
+ }
+}
