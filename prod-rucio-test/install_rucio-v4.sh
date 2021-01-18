@@ -63,5 +63,6 @@ kubectl create -f cronjobs/fts-renew/kubernetes/deployment.yaml
 kubectl create -f cronjobs/rucio-pic-admin/kubernetes/deployment.yaml
 kubectl create -f cronjobs/rucio-sync-rses/kubernetes/deployment.yaml 
 kubectl create -f cronjobs/rucio-sync-clients/kubernetes/deployment.yaml
+kubectl create -f cronjobs/rucio-pic-monitoring/kubernetes/deployment.yaml
 
 kubectl create configmap prometheus-example-cm --from-file prometheus.yml

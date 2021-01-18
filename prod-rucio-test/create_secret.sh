@@ -34,8 +34,8 @@ kubectl create secret generic server-auth-cafile --from-file=ca.pem=/$(pwd)/host
 
 kubectl create secret generic server-auth-hostcert --from-file=hostcert.pem=/$(pwd)/host-cert-k8s-v4/hostcert.pem
 kubectl create secret generic server-auth-hostkey --from-file=hostkey.pem=/$(pwd)/host-cert-k8s-v4/hostkey.pem
-# kubectl create secret generic server-auth-cafile --from-file=ca.pem=/$(pwd)/host-cert-k8s-v4/rucio03_pic_es_interm.cer
-kubectl create secret generic server-auth-cafile --from-file=ca.pem=/$(pwd)/host-cert-k8s-v4/pic01-rucio-server_pic_es_interm.cer
+kubectl create secret generic server-auth-cafile --from-file=ca.pem=/$(pwd)/host-cert-k8s-v4/rucio03_pic_es_interm.cer
+# kubectl create secret generic server-auth-cafile --from-file=ca.pem=/$(pwd)/host-cert-k8s-v4/pic01-rucio-server_pic_es_interm.cer
 
 
 export DAEMON_NAME=daemons
@@ -45,6 +45,7 @@ kubectl create secret generic ${DAEMON_NAME}-hermes-cert --from-file=usercert=/$
 kubectl create secret generic ${DAEMON_NAME}-hermes-key --from-file=userkey=/$(pwd)/host-cert-k8s-v4/hostkey.pem
 kubectl create secret generic ${DAEMON_NAME}-rucio-ca-bundle --from-file=ca-volume=/$(pwd)/host-cert-k8s-v4/pic01-rucio-server_pic_es_interm.cer
 kubectl create secret generic ${DAEMON_NAME}-rucio-x509up --from-file=proxy-volume=/tmp/x509up_u0
+kubectl create secret generic ${DAEMON_NAME}-rucio-x509up-reaper --from-file=x509up=/tmp/x509up_u0
 
 # Reapers needs the whole directory of certificates
 mkdir /tmp/reaper-certs
@@ -85,6 +86,12 @@ kubectl create secret generic web-schema --from-file=pic.py=/$(pwd)/schema/pic.p
 kubectl create secret generic web-test-permission --from-file=pic.py=/$(pwd)/permission/pic.py
 kubectl create secret generic web-test-schema --from-file=pic.py=/$(pwd)/schema/pic.py
 
-kubectl create secret generic pic01-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v2/usercert_with_key.pem
-kubectl create secret generic web-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v2/usercert_with_key.pem
-kubectl create secret generic web-test-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v2/usercert_with_key.pem
+#kubectl create secret generic pic01-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v2/usercert_with_key.pem
+#kubectl create secret generic web-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v2/usercert_with_key.pem
+#kubectl create secret generic web-test-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-web-v2/usercert_with_key.pem
+
+
+kubectl create secret generic pic01-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-k8s-v4/usercert_with_key.pem
+kubectl create secret generic web-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-k8s-v4/usercert_with_key.pem
+kubectl create secret generic web-test-usercert-with-key --from-file=usercert_with_key.pem=/$(pwd)/host-cert-k8s-v4/usercert_with_key.pem
+

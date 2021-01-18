@@ -10,7 +10,7 @@ exposeErrorLogs: True
  
 image:
   repository: rucio/rucio-ui
-  tag: release-1.24.1
+  tag: release-1.24.1.post1
   # tag: release-1.24.0
 
 strategy:
@@ -59,6 +59,8 @@ ingress:
   path: /
   hosts:
     - pic01-rucio-server-web.pic.es
+  tls:
+    - secretName: rucio-server.tls-secret
 
 proxy:
   rucioProxy: "pic01-rucio-server.pic.es"
@@ -116,5 +118,9 @@ config:
     schema: "generic"
     lfn2pfn_algorithm_default: "identity"
 
-
+  monitor:
+    carbon_server: "graphite-test.pic.es"
+    carbon_port: "2014"
+    user_scope: "rucio"
+    enable_metrics: "True"
 

@@ -1,3 +1,11 @@
+image:
+  # tag: release-1.23.11_py3
+  # tag: release-1.24.0rc1_py3
+  # tag: release-1.24.1
+  tag: release-1.24.1.post1
+  pullPolicy: Always
+
+# automatixCount: 1
 abacusAccountCount: 1
 abacusRseCount: 1
 abacusCollectionReplicaCount: 1
@@ -14,9 +22,20 @@ judgeRepairerCount: 1
 tracerKronosCount: 1
 transmogrifierCount: 1
 undertakerCount: 1
-reaper2Count: 1
+reaper2Count: 2
+reaperCount: 1
 minosCount: 1
 necromancerCount: 1
+undertakerCount: 1
+
+monitoring:
+  enabled: true
+  exporterPort: 9090
+  targetPort: 9090
+  interval: 15s
+  telemetryPath: /metrics
+  labels:
+    app: prometheus
 
 abacusAccount:
   threads: 1
@@ -47,6 +66,28 @@ abacusRse:
     limits:
       memory: "256Mi"
       cpu: "50m"
+
+undertaker:
+  threads: 1
+  resources:
+    limits:
+      memory: "200Mi"
+      cpu: "700m"
+    requests:
+      memory: "200Mi"
+      cpu: "700m"
+
+reaper:
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  greedy: 1
+  totalWorkers: 2
+  threadsPerWorker: 2
 
 reaper2:
   greedy: 1
@@ -158,12 +199,6 @@ reaper:
   threadsPerWorker: 1
   greedy: 1
 
-image:
-  # tag: release-1.23.11_py3
-  # tag: release-1.24.0rc1_py3
-  tag: release-1.24.1
-  pullPolicy: Always
-
 ftsRenewal:
   enabled: 1
   image:
@@ -218,6 +253,12 @@ judgeRepairer:
     requests:
       cpu: 750m 
 
+additionalSecrets:
+  x509up:
+    secretName: rucio-x509up-reaper
+    mountPath: /opt/proxy/x509up.pem
+    subPath: x509up.pem
+
 config:
   database:
     default: postgresql://rucio:secret@postgres-postgresql/rucio
@@ -245,8 +286,8 @@ config:
 
   monitor:
     carbon_server: "graphite-test.pic.es"
-    carbon_port: "2013"
-    user_scope: "rucio-folding"
+    carbon_port: "2014"
+    user_scope: "rucio"
     enable_metrics: "True"
 
 automaticRestart:
