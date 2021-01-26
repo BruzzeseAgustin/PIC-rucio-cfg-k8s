@@ -17,8 +17,22 @@ helm repo add twuni https://helm.twun.io
 helm install docker-registry twuni/docker-registry --version 1.9.6\
   --values registry-values.yaml
 
-read -p "Do you want to delete your current server display? " -n 1 -r
+read -p "Do you want to delete the databse display? " -n 1 -r
 echo    # (optional) move to a new line
+
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    kubectl delete -f postgres/cronjob.yaml
+    kubectl delete -f postgres/deployment.yaml
+    kubectl delete -f postgres/service.yaml
+    kubectl delete -f postgres/storage.yaml
+    kubectl delete -f postgres/init-pod.yaml
+
+fi
+
+read -p "Do you want to delete your rucio current server display? " -n 1 -r
+echo    # (optional) move to a new line
+
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     helm delete pic01
@@ -29,13 +43,16 @@ fi
 
 ./create_secret-v2.sh
 
-helm install postgres bitnami/postgresql -f postgres_values.yaml
-PSQL_POD=$(kubectl get pods postgres-postgresql-0 -n prod-rucio-test | grep "Running" | awk '{print $3}')
+kubectl	apply -f ./postgres/service.yaml
+kubectl apply -f ./postgres/deployment.yaml
+kubectl apply -f ./postgres/cronjob.yaml
+kubectl apply -f ./postgres/storage.yaml
 
-while [[ $PSQL_POD != "Running" ]]; do
-  echo 'Wait until the postgres db pod iniciates...' && PSQL_POD=$(kubectl get pods postgres-postgresql-0 -n prod-rucio-test | grep "Running" | awk '{print $3}') && CR_STATE=$(kubectl get pods postgres-postgresql-0 -n prod-rucio-test | awk '{print $3}') && echo "Current state is $CR_STATE" && sleep 1;
+PSQL_POD=$(kubectl get deployment rucio-db-mirror -n prod-rucio-test | tail -n +2 | awk '{print $4}')
+
+while [[ $PSQL_POD != "1" ]]; do
+  echo 'Wait until the postgres db pod iniciates...' && PSQL_POD=$(kubectl get deployment rucio-db-mirror -n prod-rucio-test | tail -n +2 | awk '{print $4}') && CR_STATE=$(kubectl get deployment rucio-db-mirror -n prod-rucio-test | tail -n +2 | awk '{print $4}') && echo "Current state is $CR_STATE" && sleep 1;
 done
-
 
 helm install pic01 rucio/rucio-server -f server-v3.yaml
 helm install daemons rucio/rucio-daemons -f daemons.yaml
@@ -45,17 +62,17 @@ helm install web rucio/rucio-ui -f web-ui.yaml
  
 kubectl apply -f rucio-daemon-nodeport.yaml
 
-
 # Install personal cronjobs for k8s
 
 kubectl create job renew-manual-1 --from=cronjob/daemons-renew-fts-proxy
 
 # Run other post-deployment tasks, now that all new Pods are present, and old ones are gone.
-kubectl apply -f init-pod.yaml
-INIT_POD=$(kubectl get pods test-init -n prod-rucio-test | grep "Completed" | awk '{print $3}')
+kubectl apply -f ./postgres/init-pod.yaml
+
+INIT_POD=$(kubectl get pods pic01-init -n prod-rucio-test | grep "Completed" | awk '{print $3}')
 
 while [[ $INIT_POD != "Completed" ]]; do 
-  echo 'Iniciating rucio db with basic user...' && INIT_POD=$(kubectl get pods test-init -n prod-rucio-test | grep "Completed" | awk '{print $3}')  && CR_STATE=$(kubectl get pods test-init -n prod-rucio-test | awk '{print $3}') && echo "Current state is $CR_STATE" && sleep 1;
+  echo 'Iniciating rucio db with basic user...' && INIT_POD=$(kubectl get pods pic01-init -n prod-rucio-test | grep "Completed" | awk '{print $3}')  && CR_STATE=$(kubectl get pods pic01-init -n prod-rucio-test | awk '{print $3}') && echo "Current state is $CR_STATE" && sleep 1;
 done
 
 SERVER_POD=$(kubectl get deployment pic01-rucio-server | tail -n +2 | awk '{print $4}')

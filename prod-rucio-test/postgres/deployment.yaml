@@ -35,10 +35,7 @@ spec:
         - name: POSTGRES_USER
           value: rucio
         - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: rucio-db
-              key: password
+          value: secret
         - name: RUCIO_DB_DUMP
           value: /rucio-pic/rucio-backups/rucio-db.dump
           # valueFrom:

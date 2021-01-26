@@ -112,8 +112,10 @@ config:
     mailtemplatedir: "/opt/rucio/etc/mail_templates"
 
   database:
-    default: "postgresql://rucio:secret@postgres-postgresql/rucio"
-    schema: "test"
+    # default: "postgresql://rucio:secret@postgres-postgresql/rucio"
+    # schema: "test"
+    default: "postgresql://rucio:secret@rucio-db-mirror/rucio"
+    schema: "pic01-rucio"
     pool_reset_on_return: "rollback"
     pool_timeout: "30"
     echo: "0"

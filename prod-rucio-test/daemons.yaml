@@ -259,14 +259,6 @@ additionalSecrets:
     secretName: rucio-x509up-reaper
     mountPath: /opt/proxy/x509up.pem
     subPath: x509up.pem
-  hostcert:
-    secretName: hermes-cert
-    mountPath: /opt/x509/hostkey.pem
-    subPath: hostcert.pem
-  hostkey:
-    secretName: hermes-key
-    mountPath: /opt/x509/hostkey.pem
-    subPath: hostkey.pem
 
 config:
   httpd:
@@ -279,8 +271,10 @@ config:
     ServerAdmin: "bruzzese@pic.es"
 
   database:
-    default: postgresql://rucio:secret@postgres-postgresql/rucio
-    schema: test
+    # default: postgresql://rucio:secret@postgres-postgresql/rucio
+    # schema: test
+    default: "postgresql://rucio:secret@rucio-db-mirror/rucio"
+    schema: "pic01-rucio"
 
   messaging_hermes:
     username: "hermes"

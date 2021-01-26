@@ -16,8 +16,6 @@ configMapGenerator:
       - RUCIO_DB_DUMP=/rucio-pic/rucio-backups/rucio-db.dump
 
 resources:
-  - deployment.yaml
   - service.yaml
-  - storage.yaml
-  # - cronjob.yaml
-  # - job.yaml
+  - deployment.yaml
+  - cronjob.yaml
