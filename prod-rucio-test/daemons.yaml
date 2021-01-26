@@ -2,7 +2,8 @@ image:
   # tag: release-1.23.11_py3
   # tag: release-1.24.0rc1_py3
   # tag: release-1.24.1
-  tag: release-1.24.1.post1
+  # tag: release-1.24.1.post1
+  tag: release-1.24.2
   pullPolicy: Always
 
 # automatixCount: 1
@@ -32,7 +33,7 @@ monitoring:
   enabled: true
   exporterPort: 9090
   targetPort: 9090
-  interval: 15s
+  interval: 5s
   telemetryPath: /metrics
   labels:
     app: prometheus
@@ -258,8 +259,25 @@ additionalSecrets:
     secretName: rucio-x509up-reaper
     mountPath: /opt/proxy/x509up.pem
     subPath: x509up.pem
+  hostcert:
+    secretName: hermes-cert
+    mountPath: /opt/x509/hostkey.pem
+    subPath: hostcert.pem
+  hostkey:
+    secretName: hermes-key
+    mountPath: /opt/x509/hostkey.pem
+    subPath: hostkey.pem
 
 config:
+  httpd:
+    hostname: "pic01-rucio-server.pic.es"
+    hostcert: "hostcert.pem"
+    hostkey: "hostkey.pem"
+    ca_cert: "/etc/grid-security/ca.pem"
+    ServerAlias: "pic01-rucio-server.pic.es" # should match hostname (above)
+    ServerName: "pic01-rucio-server.pic.es" # should match hostcert
+    ServerAdmin: "bruzzese@pic.es"
+
   database:
     default: postgresql://rucio:secret@postgres-postgresql/rucio
     schema: test
@@ -267,22 +285,43 @@ config:
   messaging_hermes:
     username: "hermes"
     password: "supersecret"
-    nonssl_port: "61613"
+    port: "61616"
+    nonssl_port: "61616"
     use_ssl: "False"
     destination: "/queue/events"
+    brokers: "rucio-activemq"
+    ssl_key_file: "/opt/x509/hostkey.pem"
+    ssl_cert_file: "/opt/x509/hostcert.pem"
     brokers: "activemq"
+    email_from: "bruzzese@pic.es"
+    email_test: "bruzzese@pic.es"
 
   conveyor:
     scheme: "gsiftp,root,https,davs,srm,http"
     transfertool: "fts3"
     ftshosts: "https://fts01.pic.es:8446"
     cacert: "/opt/certs/ca.pem"
-    usercert: "/opt/proxy/proxy-volume"
+    # usercert: "/opt/proxy/proxy-volume"
+    usercert: "/opt/proxy/x509up"
 
   policy:
     permission: "generic"
     schema: "generic"
     lfn2pfn_algorithm_default: "identity"
+
+  monitor:
+    carbon_server: "graphite-test.pic.es"
+    carbon_port: "2014"
+    user_scope: "rucio"
+    enable_metrics: "True"
+
+  trace:
+    tracedir: "/var/log/rucio/trace"
+    brokers: "activemq"
+    port: "61616"
+    username: "hermes"
+    password: "supersecret"
+    topic: "/topic/rucio.tracer"
 
   monitor:
     carbon_server: "graphite-test.pic.es"

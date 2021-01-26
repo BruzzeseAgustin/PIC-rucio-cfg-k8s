@@ -10,8 +10,8 @@ exposeErrorLogs: True
  
 image:
   repository: rucio/rucio-ui
-  tag: release-1.24.1.post1
-  # tag: release-1.24.0
+  tag: release-1.24.2
+  # tag: release-1.22.7
 
 strategy:
   type: RollingUpdate
@@ -23,14 +23,14 @@ nodeSelector:
   node: rucioui
   # node: rucio
   
-service: 
-  type: NodePort
-  # type: ClusterIP
+#service: 
+  # type: NodePort
+#   type: ClusterIP
   # Run the webui server on port 443 instead of 80 and accept X509 certificates and proxies
-  useSSL: true
-  port: 443
-  targetPort: https
-  portName: https
+#   useSSL: true
+#  port: 443
+#  targetPort: https
+#  portName: https
 
 oidc:
   enable: True
@@ -46,6 +46,13 @@ httpd_config:
   threads_per_child: "5"
   max_clients: "20"
   max_requests_per_child: "8192"
+  hostname: "pic01-rucio-server.pic.es"
+  hostcert: "hostcert.pem"
+  hostkey: "hostkey.pem"
+  ca_cert: "/etc/grid-security/ca.pem"
+  ServerAlias: "pic01-rucio-server.pic.es" # should match hostname (above)
+  ServerName: "pic01-rucio-server.pic.es" # should match hostcert
+  ServerAdmin: "bruzzese@pic.es"
 
 minReadySeconds: 5
 
@@ -87,6 +94,15 @@ additionalSecrets:
 
 ## values used to configure
 config:
+  httpd_config:
+    hostname: "pic01-rucio-server-web.pic.es"
+    hostcert: "hostcert.pem"
+    hostkey: "hostkey.pem"
+    ca_cert: "/etc/grid-security/ca.pem"
+    ServerAlias: "pic01-rucio-server-web.pic.es" # should match hostname (above)
+    ServerName: "pic01-rucio-server-web.pic.es" # should match hostcert
+    ServerAdmin: "bruzzese@pic.es"
+
   common:
     ## config.common.logdir: the default directoy to write logs to (default: "/var/log/rucio")
     logdir: "/var/log/rucio"
@@ -112,8 +128,8 @@ config:
 
   policy:
     # config.permission.policy: (default "generic")
-    # permission: "generic"
-    # schema: "generic"
+    # permission: "pic"
+    # schema: "pic"
     permission: "generic"
     schema: "generic"
     lfn2pfn_algorithm_default: "identity"

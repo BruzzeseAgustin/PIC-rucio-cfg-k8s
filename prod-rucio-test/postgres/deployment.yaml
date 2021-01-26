@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rucio-db-mirror
+  labels:
+    app: postgres
+    tier: data
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: data
+    spec:
+      volumes:
+      - name: postgresdb
+        persistentVolumeClaim:
+          claimName: postgres-pv-claim
+      - name: pg-data
+        emptyDir: {}
+      containers:
+      - name: postgres
+        image: postgres:11
+        imagePullPolicy: Always
+        args: ["postgres", "-p 5432"]
+        env:
+        - name: POSTGRES_DB
+          value: rucio
+        - name: PGDATA
+          value: /var/lib/postgresql/data
+        - name: POSTGRES_USER
+          value: rucio
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rucio-db
+              key: password
+        - name: RUCIO_DB_DUMP
+          value: /rucio-pic/rucio-backups/rucio-db.dump
+          # valueFrom:
+          #   configMapKeyRef:
+          #     name: rucio-db-dump
+          #     key: RUCIO_DB_DUMP
+        ports:
+        - containerPort: 5432 
+        volumeMounts:
+        - name: postgresdb
+          mountPath: /mnt/rucio-pic
+        - name: pg-data
+          mountPath: /var/lib/postgresql/data
+
+

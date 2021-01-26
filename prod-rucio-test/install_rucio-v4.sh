@@ -27,7 +27,7 @@ then
 
 fi
 
-./create_secret.sh
+./create_secret-v2.sh
 
 helm install postgres bitnami/postgresql -f postgres_values.yaml
 PSQL_POD=$(kubectl get pods postgres-postgresql-0 -n prod-rucio-test | grep "Running" | awk '{print $3}')
@@ -37,9 +37,16 @@ while [[ $PSQL_POD != "Running" ]]; do
 done
 
 
-helm install pic01 rucio/rucio-server -f server-v2.yaml
+helm install pic01 rucio/rucio-server -f server-v3.yaml
 helm install daemons rucio/rucio-daemons -f daemons.yaml
-helm install web rucio/rucio-ui -f web-ui.yaml 
+helm install web rucio/rucio-ui -f web-ui.yaml
+
+# Expose metrics to specific port of nodeport
+ 
+kubectl apply -f rucio-daemon-nodeport.yaml
+
+
+# Install personal cronjobs for k8s
 
 kubectl create job renew-manual-1 --from=cronjob/daemons-renew-fts-proxy
 
@@ -65,4 +72,4 @@ kubectl create -f cronjobs/rucio-sync-rses/kubernetes/deployment.yaml
 kubectl create -f cronjobs/rucio-sync-clients/kubernetes/deployment.yaml
 kubectl create -f cronjobs/rucio-pic-monitoring/kubernetes/deployment.yaml
 
-kubectl create configmap prometheus-example-cm --from-file prometheus.yml
+./install-monitoring-v2.sh
