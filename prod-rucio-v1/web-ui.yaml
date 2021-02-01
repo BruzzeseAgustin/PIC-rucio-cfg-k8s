@@ -1,0 +1,140 @@
+# Default values for rucio.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## replicaCount gives the number of server pods to run
+replicaCount: 1
+
+# When set, run extra busybox containers in the relevant pods to also expose the error logs
+exposeErrorLogs: True
+ 
+image:
+  repository: rucio/rucio-ui
+  tag: release-1.24.2
+  # tag: release-1.22.7
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+nodeSelector:
+  node: rucioui
+
+oidc:
+  enable: True
+
+service:
+  type: NodePort
+  #type: ClusterIP
+  useSSL: True
+  port: 443
+  targetPort: https
+  portName: https
+
+# Use http worker mode and elsewhere configure database connections for Oracle Database Resident Connection Pool (DRCP)
+httpd_config:
+  encoded_slashes: "True"
+  mpm_mode: "event"       
+  enable_status: "True"
+  start_servers: "1"
+  min_spare_threads: "1"
+  max_spare_threads: "20"
+  threads_per_child: "5"
+  max_clients: "20"
+  max_requests_per_child: "8192"
+ 
+minReadySeconds: 5
+
+apache:
+  hostname: "pic01-rucio-server-web.pic.es"
+  alias: "pic01-rucio-server-web.pic.es"
+  ca_path: "/etc/grid-security/certificates/"
+  admin:  "bruzzese@pic.es"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true" 
+  path: /
+  hosts:
+    - pic01-rucio-server-web.pic.es
+  tls:
+    - secretName: rucio-server.tls-secret
+
+proxy:
+  rucioProxy: "pic01-rucio-server.pic.es"
+  rucioProxyScheme: "https"
+  rucioAuthProxy: "pic01-rucio-server-auth.pic.es"
+  rucioAuthProxyScheme: "https"  
+
+additionalSecrets: 
+  usercert:
+    secretName: usercert-with-key
+    mountPath: /opt/rucio/etc/usercert_with_key.pem
+    subPath: usercert_with_key.pem
+  certs:
+    secretName: certs
+    mountPath: /etc/grid-security/certificates
+  policy:
+    secretName: permission
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/core/permission/pic.py
+    subPath: pic.py
+  schema:
+    secretName: schema
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/common/schema/pic.py
+    subPath: pic.py
+  rucio:
+    secretName: rucio
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/web/ui/static/rucio.js
+    subPath: rucio.js
+  base:
+    secretName: base
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/web/ui/static/base.js
+    subPath: base.js
+
+
+## values used to configure
+config:
+
+  common:
+    ## config.common.logdir: the default directoy to write logs to (default: "/var/log/rucio")
+    logdir: "/var/log/rucio"
+    ## config.common.logdir: the max loglevel (default: "DEBUG")
+    loglevel: "DEBUG"
+    ## config.common.mailtemplatedir: directory containing the mail templates (default: "/opt/rucio/etc/mail_templates")
+    mailtemplatedir: "/opt/rucio/etc/mail_templates"
+
+  database:
+    default: "postgresql://rucio:secret@rucio-db-mirror/rucio"
+    schema: "pic01-rucio"
+    pool_reset_on_return: "rollback"
+    pool_timeout: "30"
+    echo: "0"
+    max_overflow: "10"
+    pool_size: "2"
+    pool_recycle: "600"
+
+  ## Only necessary for webui deployments
+  webui:
+    ## config.webui.usercert:  (default "/opt/rucio/etc/usercert_with_key.pem")
+    usercert: "/opt/rucio/etc/usercert_with_key.pem"
+
+  policy:
+    # config.permission.policy: (default "generic")
+    permission: "pic"
+    schema: "pic"
+    permission: "generic"
+    schema: "generic"
+    lfn2pfn_algorithm_default: "identity"
+
+  monitor:
+    carbon_server: "graphite-test.pic.es"
+    carbon_port: "2014"
+    user_scope: "rucio"
+    enable_metrics: "True"
+

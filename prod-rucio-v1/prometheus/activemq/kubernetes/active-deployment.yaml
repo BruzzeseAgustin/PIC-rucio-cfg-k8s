@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activemq
+  labels:
+    app: activemq
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: activemq
+  template:
+    metadata:
+      labels:
+        app: activemq
+    spec:
+      containers:
+      - name: activemq
+        image: webcenter/activemq:latest
+        imagePullPolicy: Always
+        ports:
+        - name: stomp
+          containerPort: 61616
+        - name: dashboard
+          containerPort: 8161
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 100m
+          limits:
+            memory: 2Gi
+            cpu: 1
+        env:
+        - name: ACTIVEMQ_CONFIG_NAME
+          value: "activemq"
+        - name: ACTIVEMQ_CONFIG_DEFAULTACCOUNT
+          value: "false"
+        - name: ACTIVEMQ_USERS_hermes
+          value: "supersecret"
+        - name: ACTIVEMQ_GROUPS_writes
+          value: "hermes"
+        - name: ACTIVEMQ_USERS_logstash
+          value: "supersecret"
+        - name: ACTIVEMQ_GROUPS_reads
+          value: "logstash"
+        - name: ACTIVEMQ_CONFIG_SCHEDULERENABLED
+          value: "true"
+        - name: ACTIVEMQ_ADMIN_LOGIN
+          value: "admin"
+        - name: ACTIVEMQ_ADMIN_PASSWORD
+          value: "supersecret"
+
