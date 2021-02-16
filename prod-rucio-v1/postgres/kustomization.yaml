@@ -19,3 +19,5 @@ resources:
   - service.yaml
   - deployment.yaml
   - cronjob.yaml
+  - configmap.yaml
+ 

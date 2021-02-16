@@ -1,9 +1,6 @@
 image:
   repository: rucio/rucio-server
   tag: release-1.24.2
-  # tag: release-1.23.11_py3
-  # tag: release-1.23.8_py3
-  # pullPolicy: Never
 
 # For NGINX ingress. Eventually becomes plain server
 replicaCount: 1
@@ -83,14 +80,6 @@ useSSL:
   Server: True
   authServer: False
 
-# authService:
-#    type: ClusterIP
-#   # type: NodePort
-#   port: 443
-#  targetPort: 443
-#   protocol: TCP
-#   name: https
-
 authIngress:
   enabled: true
   annotations: 
@@ -134,8 +123,6 @@ config:
     usercert: "/opt/proxy/x509up"
 
   database:
-    # default: "postgresql://rucio:secret@postgres-postgresql/rucio"
-    # schema: "test"
     default: "postgresql://rucio:secret@rucio-db-mirror/rucio"
     schema: "pic01-rucio"
 
@@ -184,6 +171,3 @@ config:
 
 nodeSelector:
   {}
-  # node: rucioui
-  # node: rucio
-

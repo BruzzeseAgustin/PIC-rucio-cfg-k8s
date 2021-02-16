@@ -7,6 +7,7 @@ metadata:
     app: postgres
     tier: data
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -22,11 +23,17 @@ spec:
           claimName: postgres-pv-claim
       - name: pg-data
         emptyDir: {}
+      nodeSelector:
+        node: rucio
       containers:
       - name: postgres
-        image: postgres:11
-        imagePullPolicy: Always
+        image: postgres:latest
+        imagePullPolicy: IfNotPresent
         args: ["postgres", "-p 5432"]
+
+        envFrom:
+          - configMapRef:
+              name: postgres-config
         env:
         - name: POSTGRES_DB
           value: rucio
@@ -42,6 +49,16 @@ spec:
           #   configMapKeyRef:
           #     name: rucio-db-dump
           #     key: RUCIO_DB_DUMP
+        - name: POSTGRESQL_MAX_CONNECTIONS
+          value: "1000"
+        # - name:  PGOPTIONS
+        #   value: "-c max_connections=1000  -c shared_buffers=1024MB"
+        # - name: POSTGRES_OPTIONS
+        #   value: "-c max_connections=1000  -c shared_buffers=1024MB"
+        # - name:  PG_OPTIONS
+        #  value: "-c max_connections=1000  -c shared_buffers=1024MB"
+        - name: MAX_CONNECTIONS
+          value: "1000"
         ports:
         - containerPort: 5432 
         volumeMounts:
@@ -49,5 +66,4 @@ spec:
           mountPath: /mnt/rucio-pic
         - name: pg-data
           mountPath: /var/lib/postgresql/data
-
 

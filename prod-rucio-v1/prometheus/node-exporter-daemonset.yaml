@@ -15,6 +15,7 @@ spec:
         name: node-exporter
       annotations:
          prometheus.io/scrape: "true"
+         prometheus.io/path: '/metrics'
          prometheus.io/port: "9100"
     spec:
       hostPID: true

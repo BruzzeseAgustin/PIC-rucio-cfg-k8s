@@ -51,4 +51,3 @@ spec:
               claimName: postgres-pv-claim
           restartPolicy: OnFailure
 
-

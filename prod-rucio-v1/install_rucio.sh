@@ -46,7 +46,7 @@ then
 
 fi
 
-./create_secret-v2.sh
+./create_secret.sh
 
 kubectl	apply -f ./postgres/service.yaml
 kubectl apply -f ./postgres/deployment.yaml
@@ -59,7 +59,7 @@ while [[ $PSQL_POD != "1" ]]; do
   echo 'Wait until the postgres db pod iniciates...' && PSQL_POD=$(kubectl get deployment rucio-db-mirror -n prod-rucio-test | tail -n +2 | awk '{print $4}') && CR_STATE=$(kubectl get deployment rucio-db-mirror -n prod-rucio-test | tail -n +2 | awk '{print $4}') && echo "Current state is $CR_STATE" && sleep 1;
 done
 
-helm install pic01 rucio/rucio-server -f server-v3.yaml
+helm install pic01 rucio/rucio-server -f server.yaml
 helm install daemons rucio/rucio-daemons -f daemons.yaml
 helm install web rucio/rucio-ui -f web-ui.yaml
 
@@ -87,11 +87,16 @@ while [[ $SERVER_POD == "0" && $AUTH_POD != "1" ]]; do
   echo 'Iniciating rucio server and auth service...' && SERVER_POD=$(kubectl get deployment pic01-rucio-server | tail -n +2 | awk '{print $4}') && AUTH_POD=$(kubectl get deployment pic01-rucio-server-auth | awk '{print $2}') && CR_STATE_S=$(kubectl get deployment pic01-rucio-server | awk '{print $2}') && CR_STATE_A=$(kubectl get deployment pic01-rucio-server-auth | awk '{print $2}') && echo 'Current state is for server and auth are ' $CR_STATE_S $CR_STATE_A ' respecively' && sleep 1;
 done
 
-# git clone https://github.com/pic-es/cronjobs.git
+# Export psql events 
+helm install psql prometheus-community/prometheus-postgres-exporter -f postgres-exporter/psql-exporter.yaml
+kubectl create -f  postgres-exporter/psql-exporter-nodeport.yaml
+
+git clone https://github.com/pic-es/PIC-rucio-cronjobs.git
 kubectl create -f cronjobs/fts-renew/kubernetes/deployment.yaml
 kubectl create -f cronjobs/rucio-pic-admin/kubernetes/deployment.yaml
 kubectl create -f cronjobs/rucio-sync-rses/kubernetes/deployment.yaml 
 kubectl create -f cronjobs/rucio-sync-clients/kubernetes/deployment.yaml
 kubectl create -f cronjobs/rucio-pic-monitoring/kubernetes/deployment.yaml
 
-./install-monitoring-v2.sh
+# This is not really necessary 
+./install_monitoring.sh

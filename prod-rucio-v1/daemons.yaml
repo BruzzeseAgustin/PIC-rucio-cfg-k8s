@@ -1,21 +1,17 @@
 image:
-  # tag: release-1.23.11_py3
-  # tag: release-1.24.0rc1_py3
-  # tag: release-1.24.1
-  # tag: release-1.24.1.post1
   tag: release-1.24.2
   pullPolicy: Always
 
 # automatixCount: 1
-abacusAccountCount: 1
-abacusRseCount: 1
-abacusCollectionReplicaCount: 1
+abacusAccountCount: 2
+abacusRseCount: 2
+abacusCollectionReplicaCount: 2
 conveyorTransferSubmitterCount: 2
 conveyorPollerCount: 2
 conveyorFinisherCount: 2
 conveyorReceiverCount: 2
 conveyorThrottlerCount: 2
-hermesCount: 1
+hermesCount: 2
 judgeCleanerCount: 1
 judgeEvaluatorCount: 1
 judgeInjectorCount: 2
@@ -33,7 +29,7 @@ monitoring:
   enabled: true
   exporterPort: 9090
   targetPort: 9090
-  interval: 30s
+  interval: 60s
   telemetryPath: /metrics
   labels:
     app: prometheus
@@ -115,7 +111,6 @@ undertaker:
 conveyorTransferSubmitter:
   threads: 5
   sleepTime: 2
-  # activities: "'Express' 'Functional Test' 'User Subscriptions'"
   activities: "'Data Brokering' 'Data rebalancing' 'Debug' 'Express' 'Functional Test' 'Group Subscriptions' 'Production Input' 'Production Output' 'Analysis Input' 'Analysis Output' 'Staging' 'T0 Export' 'T0 Tape' 'Upload/Download (Job)' 'Upload/Download (User)' 'User Subscriptions'"
   resources:
     requests:
@@ -271,8 +266,6 @@ config:
     ServerAdmin: "bruzzese@pic.es"
 
   database:
-    # default: postgresql://rucio:secret@postgres-postgresql/rucio
-    # schema: test
     default: "postgresql://rucio:secret@rucio-db-mirror/rucio"
     schema: "pic01-rucio"
 
@@ -332,6 +325,5 @@ automaticRestart:
   schedule: "5 1 * * *"
 
 nodeSelector:
-  # node: rucioui
   node: rucio
 
