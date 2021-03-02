@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: rucio-db-backup
+  name: rucio-db-backup-v1
   labels:
     tier: data
 spec:
@@ -25,7 +25,7 @@ spec:
             - echo "$(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB)" && pg_dump -Z9 -Fc -h $(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB) > $(RUCIO_DB_DUMP).`date +%Y-%m-%d-%H-%M`; find /rucio-pic/rucio-backups -size 0 | tr "\n" "\0" | xargs -0 rm --; ls -d -1 -tp /rucio-pic/rucio-backups/* | grep -v "/$" | tail -n +3 | tr "\n" "\0" | xargs -0 rm --; ls -l /rucio-pic/rucio-backups
             volumeMounts:
             - mountPath: /rucio-pic/rucio-backups/
-              name: postgredb
+              name: postgresdb
             resources:
               limits:
                 cpu: 1
@@ -35,7 +35,7 @@ spec:
                 memory: 4Gi
             env:
             - name: RUCIO_DB_HOST
-              value: rucio-db-mirror
+              value: rucio-db-mirror-v1
             - name: POSTGRES_DB
               value: rucio
             - name: POSTGRES_USER
@@ -46,8 +46,8 @@ spec:
               value: /rucio-pic/rucio-backups/rucio-db.dump
 
           volumes:
-          - name: postgredb
+          - name: postgresdb
             persistentVolumeClaim:
-              claimName: postgres-pv-claim
+              claimName: pvc-postgress
           restartPolicy: OnFailure
 

@@ -110,7 +110,7 @@ config:
     mailtemplatedir: "/opt/rucio/etc/mail_templates"
 
   database:
-    default: "postgresql://rucio:secret@rucio-db-mirror/rucio"
+    default: "postgresql://rucio:secret@rucio-db-mirror-v1/rucio"
     schema: "pic01-rucio"
     pool_reset_on_return: "rollback"
     pool_timeout: "30"

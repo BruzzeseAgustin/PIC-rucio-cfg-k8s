@@ -266,7 +266,7 @@ config:
     ServerAdmin: "bruzzese@pic.es"
 
   database:
-    default: "postgresql://rucio:secret@rucio-db-mirror/rucio"
+    default: "postgresql://rucio:secret@rucio-db-mirror-v1/rucio"
     schema: "pic01-rucio"
 
   messaging_hermes:

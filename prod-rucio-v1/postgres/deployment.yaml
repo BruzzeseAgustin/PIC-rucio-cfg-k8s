@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rucio-db-mirror
+  name: rucio-db-mirror-v1
   labels:
     app: postgres
     tier: data
@@ -20,7 +20,7 @@ spec:
       volumes:
       - name: postgresdb
         persistentVolumeClaim:
-          claimName: postgres-pv-claim
+          claimName: pvc-postgress
       - name: pg-data
         emptyDir: {}
       nodeSelector:
@@ -33,7 +33,7 @@ spec:
 
         envFrom:
           - configMapRef:
-              name: postgres-config
+              name: postgres-config-v1
         env:
         - name: POSTGRES_DB
           value: rucio
@@ -45,18 +45,8 @@ spec:
           value: secret
         - name: RUCIO_DB_DUMP
           value: /rucio-pic/rucio-backups/rucio-db.dump
-          # valueFrom:
-          #   configMapKeyRef:
-          #     name: rucio-db-dump
-          #     key: RUCIO_DB_DUMP
         - name: POSTGRESQL_MAX_CONNECTIONS
           value: "1000"
-        # - name:  PGOPTIONS
-        #   value: "-c max_connections=1000  -c shared_buffers=1024MB"
-        # - name: POSTGRES_OPTIONS
-        #   value: "-c max_connections=1000  -c shared_buffers=1024MB"
-        # - name:  PG_OPTIONS
-        #  value: "-c max_connections=1000  -c shared_buffers=1024MB"
         - name: MAX_CONNECTIONS
           value: "1000"
         ports:

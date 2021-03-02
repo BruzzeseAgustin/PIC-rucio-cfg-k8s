@@ -63,7 +63,7 @@ securityContext: {}
 config:
   datasource:
     # Specify one of both datasource or datasourceSecret
-    host: rucio-db-mirror
+    host: rucio-db-mirror-v1
     user: rucio
     # Only one of password and passwordSecret can be specified
     password: secret

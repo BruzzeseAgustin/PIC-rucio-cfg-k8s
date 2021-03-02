@@ -1,7 +1,7 @@
  apiVersion: v1
  kind: Pod
  metadata:
-   name: pic01-init
+   name: pic01-init-v1
    labels:
      app: rucio
    namespace: prod-rucio-test
@@ -13,7 +13,6 @@
        imagePullPolicy: Always
        env:
          - name: RUCIO_CFG_DATABASE_DEFAULT
-           # value: postgresql://rucio:secret@postgres-postgresql/rucio
-           value: postgresql://rucio:secret@rucio-db-mirror/rucio
+           value: postgresql://rucio:secret@rucio-db-mirror-v1/rucio
          - name: RUCIO_CFG_DATABASE_SCHEMA
            value: pic01-rucio

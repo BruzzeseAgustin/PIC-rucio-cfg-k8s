@@ -1,31 +1,13 @@
-kind: PersistentVolume
 apiVersion: v1
-metadata:
-  name: postgres-pv-volume
-  labels:
-    type: local
-    app: postgres
-  namespace: prod-rucio-test
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: "/rucio-pic/rucio-backups/"
----
 kind: PersistentVolumeClaim
-apiVersion: v1
 metadata:
-  name: postgres-pv-claim
-  labels:
-    app: postgres
+  name: pvc-postgress
   namespace: prod-rucio-test
 spec:
-  storageClassName: manual
   accessModes:
-    - ReadWriteMany
+  - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 100Gi
+  storageClassName: ceph-rbd-sc
+  volumeMode: Filesystem
