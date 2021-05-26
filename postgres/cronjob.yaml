@@ -1,0 +1,54 @@
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: rucio-db-backup
+  namespace: prod-rucio-test
+  labels:
+    tier: data
+spec:
+  schedule: "0 */6 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            node: rucio
+          containers:
+          - name: postgres
+            image: postgres:latest
+            imagePullPolicy: IfNotPresent
+            args:
+            - /bin/bash 
+            - -c
+            - echo "$(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB)" && pg_dump -Z9 -Fc -h $(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB) > $(RUCIO_DB_DUMP).`date +%Y-%m-%d-%H-%M`; find //rucio/ -size 0 | tr "\n" "\0" | xargs -0 rm --; ls -d -1 -tp /rucio/* | grep -v "/$" | tail -n +3 | tr "\n" "\0" | xargs -0 rm --; ls -l /rucio/
+            volumeMounts:
+            - mountPath: /rucio/
+              name: postgresdb
+            resources:
+              limits:
+                cpu: 1
+                memory: 8Gi
+              requests:
+                cpu: 1
+                memory: 4Gi
+            env:
+            - name: RUCIO_DB_HOST
+              value: rucio-db
+            - name: POSTGRES_DB
+              value: rucio
+            - name: POSTGRES_USER
+              value: rucio
+            - name: PGPASSWORD
+              value: secret
+            - name: RUCIO_DB_DUMP
+              value: /rucio/rucio-db.dump
+
+          volumes:
+          - name: postgresdb
+            persistentVolumeClaim:
+              claimName: rucio-psql-v1
+          restartPolicy: OnFailure
+

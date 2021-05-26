@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    apps: rucio-daemon-service
+  name: rucio-daemons-service
+  namespace: prod-rucio-test
+spec:
+  ports:
+  - name: example-port
+    protocol: TCP
+    port: 9090 # CLUSTERIP PORT
+    targetPort: metrics # POD PORT WHICH APPLICATION IS RUNNING ON 
+    nodePort: 30569 # HERE!
+  externalIPs:
+  - 192.168.96.84
+  selector: 
+    app: rucio-daemons
+    release: daemons
+  sessionAffinity: None
+  type:	NodePort

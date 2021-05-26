@@ -1,0 +1,257 @@
+image:
+  repository: rucio/rucio-server
+  tag: release-1.24.3
+  # tag: release-1.23.8_py3 
+  pullPolicy: IfNotPresent
+
+# For NGINX ingress. Eventually becomes plain server
+replicaCount: 1
+authReplicaCount: 1
+traceReplicaCount: 0
+
+monitoring:
+  enabled: true
+  exporterPort: 8080
+  targetPort: 8080
+  interval: 10s
+  telemetryPath: /metrics
+  namespace: monitoring
+  labels:
+    apps: prometheus
+
+exposeErrorLogs:
+  server: True
+  authServer: True
+  traceServer: True
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+automaticRestart:
+  enabled: 1
+  image:
+    repository: bitnami/kubectl
+    tag: 1.18
+    pullPolicy: IfNotPresent
+  schedule: "5 1 * * *"
+
+# Use http worker mode and elsewhere configure database connections for Oracle Database Resident Connection Pool (DRCP)
+httpd_config:
+  encoded_slashes: "True"
+  mpm_mode: "event"
+  enable_status: "True"
+  keep_alive: "On"
+  keep_alive_timeout: "5"
+  max_keep_alive_requests: "128"
+  server_limit: "10"
+  start_servers: "4"
+  thread_limit: "128"
+  threads_per_child: "128"
+  min_spare_threads: "256"
+  max_spare_threads: "512"
+  max_request_workers: "1280"
+  max_connections_per_child: "2048"
+
+Service:
+  # type: ClusterIP
+  type: NodePort
+  port: 443
+  targetPort: 443
+  protocol: TCP
+  name: https
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/frontend-entry-points: http, https
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  path: /
+  hosts:
+    - pic01-rucio-server.pic.es
+  tls: 
+    - secretName: rucio-server.tls-secret
+
+# Auth server runs on 443 and needs the connection forwarded straight through
+
+useSSL:
+  Server: True
+  authServer: False
+  traceServer: False
+
+authIngress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    #nginx.ingress.kubernetes.io/frontend-entry-points: http, https
+    #nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  path: /
+  hosts: 
+    - pic01-rucio-server-auth.pic.es
+  tls:
+    - secretName: rucio-server.tls-secret
+
+traceIngress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    #nginx.ingress.kubernetes.io/frontend-entry-points: http, https
+    #nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  path: /
+  hosts: 
+    - pic01-rucio-server-trace.pic.es
+  tls:
+    - secretName: rucio-server.tls-secret
+
+resources:
+  requests:
+    memory: 2500Mi
+  limits:
+    memory: 2500Mi
+
+livenessProbe:
+  server:
+    initialDelaySeconds: 10
+    periodSeconds: 20
+    timeoutSeconds: 5
+  authServer:
+    initialDelaySeconds: 10
+    periodSeconds: 20
+    timeoutSeconds: 5
+  traceServer:
+    initialDelaySeconds: 10
+    periodSeconds: 20
+    timeoutSeconds: 5
+
+serverType:
+  server: api
+  authServer: auth
+  traceServer: trace
+
+logFormat:
+  server: '[%{%Y-%m-%d %H:%M:%S}t]\t%v\t%h\t%{X-Forwarded-For}i\t%{X-Rucio-RequestId}i\t%>s\t%I\t%B\t%D\t\"%r\"\t\"%{X-Rucio-Auth-Token}i\"\t\"%{User-Agent}i\"\t%{X-Rucio-Script}i'
+  authServer: '[%{%Y-%m-%d %H:%M:%S}t]\t%v\t%h\t%{X-Forwarded-For}i\t%{X-Rucio-RequestId}i\t%>s\t%I\t%B\t%D\t\"%r\"\t\"%{X-Rucio-Auth-Token}i\"\t\"%{User-Agent}i\"\t%{X-Rucio-Script}i'
+  traceServer: '[%{%Y-%m-%d %H:%M:%S}t]\t%v\t%h\t%{X-Forwarded-For}i\t%{X-Rucio-RequestId}i\t%>s\t%I\t%B\t%D\t\"%r\"\t\"%{X-Rucio-Auth-Token}i\"\t\"%{User-Agent}i\"\t%{X-Rucio-Script}i'
+
+wsgi:
+  daemonProcesses: "4"
+  daemonThreads: "4"
+
+additionalSecrets:
+  policy:
+    secretName: permission
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/core/permission/
+    subPaths: 
+      - pic.py
+  schema:
+    secretName: schema
+    mountPath: /usr/local/lib/python3.6/site-packages/rucio/common/schema/
+    subPaths: 
+      - pic.py
+  usercert:
+    secretName: usercert-with-key
+    mountPath: /opt/rucio/etc/
+    subPaths: 
+      - usercert_with_key.pem
+  mail-templates:
+    secretName: mail-templates
+    mountPath: /opt/rucio/etc/mail_templates/
+    subPaths:
+      - rule_ok_notification.tmpl
+      - rule_approval_request.tmpl
+      - rule_approved_admin.tmpl
+      - rule_approved_user.tmpl
+      - rule_denied_admin.tmpl
+      - rule_denied_user.tmpl
+
+config:
+  conveyor:
+    scheme: "gsiftp,root,https,davs,srm,http"
+    transfertool: "fts3"
+    ftshosts: "https://fts01.pic.es:8446,https://fts02.pic.es:8446"
+    cacert: "/opt/certs/ca.pem"
+    usercert: "/opt/proxy/x509up"
+
+  database:
+    default: "postgresql://rucio:secret@rucio-postgresql/rucio"
+    schema: "pic01-rucio"
+
+  policy:
+    permission: "pic"
+    schema: "pic"
+    lfn2pfn_algorithm_default: "identity" 
+
+  webui:
+    usercert: "/opt/rucio/etc/usercert_with_key.pem"
+
+  messaging_hermes:
+    username: "admin"
+    password: "admin"
+    port: "32005"
+    nonssl_port: "32005"
+    use_ssl: "false"
+    destination: "/queue/events"
+    ssl_key_file: "/opt/x509/hostkey.pem"
+    ssl_cert_file: "/opt/x509/hostcert.pem"
+    brokers: "192.168.96.77"
+    email_from: "bruzzese@pic.es"
+    email_test: "bruzzese@pic.es"
+
+  tracer-kronos:
+    username: "admin"
+    password: "admin"
+    port: "32005"
+    nonssl_port: "32005"
+    brokers: "192.168.96.77"
+    use_ssl: "false"
+    ssl_key_file: "/opt/x509/hostkey.pem"
+    ssl_cert_file: "/opt/x509/hostcert.pem"
+    queue: "/queue/Consumer.kronos.rucio.tracer"
+    prefetch_size: "10"
+    chunksize: "10"
+    subscription_id: "rucio-tracer-listener"
+    reconnect_attempts: "100"
+    dataset_wait: "60"
+
+  monitor:
+    carbon_server: "graphite-test.pic.es"
+    carbon_port: "2014"
+    user_scope: "rucio"
+    enable_metrics: "True"
+
+  trace:
+    username: "admin"
+    password: "admin"
+    port: "32005"
+    nonssl_port: "32005"
+    brokers: "192.168.96.77"
+    tracedir: "/var/log/rucio/trace"
+    topic: "/topic/rucio.tracer"
+
+  monitor:
+    carbon_server: "graphite-test.pic.es"
+    carbon_port: "2014"
+    user_scope: "rucio"
+    enable_metrics: "True"
+
+  nongridTrace:
+    tracedir: "/var/log/rucio/trace"
+    brokers: "192.168.96.77"
+    port: "32005"
+    username: "admin"
+    password: "admin"
+    topic: "/topic/rucio.tracer"
+
+  api:
+    endpoints: "accountlimits, accounts, archives, config, credentials, dids, export, heartbeats, identities, import, lifetime_exceptions, locks, meta, ping, redirect, replicas, requests, rses, rules, scopes, subscriptions"
+
+nodeSelector:
+  node: rucio
