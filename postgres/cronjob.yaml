@@ -49,6 +49,6 @@ spec:
           volumes:
           - name: postgresdb
             persistentVolumeClaim:
-              claimName: rucio-psql-v1
+              claimName: rucio-psql-pvc
           restartPolicy: OnFailure
 
