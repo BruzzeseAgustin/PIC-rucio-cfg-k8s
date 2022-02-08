@@ -9,6 +9,7 @@ kubectl create -f prometheus/namespace.yaml
 kubectl create -f prometheus/prometheus-role.yaml
 kubectl create -f prometheus/prometheus-config.yaml
 kubectl create -f prometheus/prometheus-deployment.yaml
+kubectl create -f prometheus/prometheus-loadbalancer.yaml
 
 kubectl create -f prometheus/grafana-config.yaml
 kubectl create -f prometheus/grafana-deployment.yaml

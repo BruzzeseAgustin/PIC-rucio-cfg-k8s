@@ -11,7 +11,8 @@ exposeErrorLogs: True
 image:
   repository: rucio/rucio-ui
   # tag: release-1.24.3
-  tag: release-1.23.8
+  tag: release-1.23.14
+  # tag: release-1.26.0
   pullPolicy: IfNotPresent
 strategy:
   type: RollingUpdate
@@ -20,18 +21,26 @@ strategy:
     maxUnavailable: 1
 
 nodeSelector:
-  node: rucioui
+  node: rucio
 
 oidc:
   enable: True
 
-service:
+# Service:
+#  type: NodePort
+#  # type: ClusterIP
+#  useSSL: True
+#  port: 80
+#  targetPort: http
+#  portName: http
+
+Service:
   type: NodePort
-  # type: ClusterIP
-  useSSL: True
-  port: 443
-  targetPort: https
-  portName: https
+  port: 80
+  targetPort: 80
+  protocol: TCP
+  name: http
+  annotations: {}
 
 # Use http worker mode and elsewhere configure database connections for Oracle Database Resident Connection Pool (DRCP)
 httpd_config:
@@ -73,13 +82,25 @@ proxy:
   rucioAuthProxyScheme: "https"  
 
 additionalSecrets: 
-  rucio:
-    secretName: web-ui
-    mountPath: /usr/local/lib/python3.6/site-packages/rucio/web/ui/static/
-    subPaths: 
-      - rucio.js
-      - base.js
-  
+   rucio:
+     secretName: web-ui
+     # mountPath: /usr/local/lib/python3.6/site-packages/rucio/web/ui/static/
+     mountPath: /usr/lib/python2.7/site-packages/rucio/web/ui/static/rucio.js
+     subPath: rucio.js  
+#    rucio:
+#      secretName: rucio
+#      mountPath: /usr/lib/python2.7/site-packages/rucio/web/ui/static/rucio.js
+#      # mountPath: /usr/local/lib/python3.6/site-packages/rucio/web/ui/static/rucio.js
+#    base:
+#      secretName: base
+#      mountPath: /usr/lib/python2.7/site-packages/rucio/web/ui/static/base.js
+#      # mountPath: /usr/local/lib/python3.6/site-packages/rucio/web/ui/static/base.js
+#      subPath: base.js
+#   base:
+#     secretName: base
+#     mountPath: /usr/lib/python2.7/site-packages/rucio/web/ui/static/ 
+#     subPaths:
+#       - base.js
 
 ## values used to configure
 config:
@@ -93,8 +114,8 @@ config:
     mailtemplatedir: "/opt/rucio/etc/mail_templates"
 
   database:
-    default: "postgresql://rucio:secret@rucio-postgresql/rucio"
-    schema: "pic01-rucio"
+    default: "postgresql://rucio:secret@rucio-postgresql:5432/rucio"
+    schema: "test"
     pool_reset_on_return: "rollback"
     pool_timeout: "30"
     echo: "0"

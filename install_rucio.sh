@@ -61,7 +61,8 @@ while [[ $PSQL_POD != "Running" ]]; do
 done
 
 helm install pic01 rucio/rucio-server -f server.yaml
-helm install daemons rucio/rucio-daemons -f daemons.yaml
+# helm install daemons rucio/rucio-daemons -f daemons.yaml
+helm install daemons ./rucio-daemons -f daemons.yaml
 helm install web rucio/rucio-ui -f web-ui.yaml
 
 # Expose metrics to specific port of nodeport
@@ -88,7 +89,7 @@ while [[ $SERVER_POD == "0" && $AUTH_POD != "1" ]]; do
 done
 
 # Export psql events 
-helm install psql prometheus-community/prometheus-postgres-exporter -f postgres-exporter/psql-exporter.yaml
+helm upgrade --install psql prometheus-community/prometheus-postgres-exporter -f postgres-exporter/psql-exporter.yaml
 # kubectl create -f  postgres-exporter/psql-exporter-nodeport.yaml
 
 git clone https://github.com/pic-es/PIC-rucio-cronjobs.git
@@ -100,3 +101,4 @@ kubectl create -f cronjobs/rucio-pic-monitoring/kubernetes/deployment.yaml
 
 # This is not really necessary 
 ./install_monitoring.sh
+

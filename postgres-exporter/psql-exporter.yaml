@@ -63,7 +63,7 @@ securityContext: {}
 config:
   datasource:
     # Specify one of both datasource or datasourceSecret
-    host: rucio-db
+    host: rucio-postgresql
     user: rucio
     # Only one of password and passwordSecret can be specified
     password: secret
@@ -296,8 +296,8 @@ config:
             description: "Total time the statement spent writing blocks, in milliseconds (if track_io_timing is enabled, otherwise zero)"
 
 nodeSelector: 
-  node: rucio
-
+  # node: rucio
+  kubernetes.io/hostname: kube02
 tolerations: []
 
 affinity: {}

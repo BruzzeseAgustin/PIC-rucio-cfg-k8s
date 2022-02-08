@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+  namespace: monitoring
+data:
+  prometheus.rules: |-
+    groups:
+
+    - name: Psql
+      rules:
+      - alert: Database Operative
+        expr: pg_up < 1 or absent(pg_up) 
+        for: 1m
+        labels:
+          severity: slack
+        annotations:
+          summary: Database operative
+
+    - name: Psql size
+      rules:
+      - alert: Database Size
+        expr: pg_database_size{datname="rucio",instance="192.168.96.77:31260",job="psql",server="rucio-db-mirror:5432"} > 10000000000
+        for: 1m
+        labels:
+          severity: slack
+        annotations:
+          summary: High Database Occupancy size
+ 
+    - name: DBS service has no cpu number 
+      rules:
+      - alert: Database Size
+        expr: pg_settings_cpu_index_tuple_cost == 0
+        for: 1m
+        labels:
+          severity: high
+          action: Please restart DBS instance
+        annotations:
+          summary: DB has no CPU activity for more than 1m
+
+  prometheus.yml: |-
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+
+    rule_files:
+      - /etc/prometheus/prometheus.rules
+    # Alerting specifies settings related to the Alertmanager
+    alerting:
+      alertmanagers:
+        - static_configs:
+          - targets:
+            # Alertmanager's default port is 9093
+            - alertmanager.monitoring.svc:9093
+
+    scrape_configs:
+
+      - job_name: 'rucio/stats'
+        scrape_interval: 1s
+        metrics_path: /metrics
+        scheme: http
+        kubernetes_sd_configs:
+        - role: endpoints
+          namespaces:
+            names:
+            - 'prod-rucio-test'
+        relabel_configs:
+          - target_label: cluster_name
+            replacement: rucio
+          - target_label: kubernetes_namespace
+            replacement: prod-rucio-test
+          - action: labelmap
+            regex: __meta_kubernetes_node_pod_(.+)
+          - source_labels: [__meta_kubernetes_service_name]
+            action: replace
+            target_label: kubernetes_name
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+          - source_labels : [__meta_kubernetes_pod_container_port_number]
+            action: drop
+            regex: 443
+          - source_labels : [__meta_kubernetes_pod_container_port_number]
+            action: drop
+            regex: 80
+          - source_labels : [__meta_kubernetes_pod_container_port_number]
+            action: drop
+            regex: 5432
+          - source_labels: [__meta_kubernetes_pod_label_rucio_daemon]
+            action: replace
+            target_label: kubernetes_rucio_daemon
+
+      - job_name: 'rucio-test/stats'
+        scrape_interval: 1s
+        metrics_path: /metrics
+        scheme: http
+        kubernetes_sd_configs:
+        - role: endpoints
+          namespaces:
+            names:
+            - 'prod-rucio-test'
+        relabel_configs:
+          - target_label: cluster_name
+            replacement: rucio
+          - target_label: kubernetes_namespace
+            replacement: prod-rucio-test
+          - action: labelmap
+            regex: __meta_kubernetes_node_pod_(.+)
+          - source_labels: [__meta_kubernetes_service_name]
+            action: replace
+            target_label: kubernetes_name
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+          - source_labels : [__meta_kubernetes_pod_container_port_number]
+            action: drop
+            regex: 443
+          - source_labels : [__meta_kubernetes_pod_container_port_number]
+            action: drop
+            regex: 80
+          - source_labels : [__meta_kubernetes_pod_container_port_number]
+            action: drop
+            regex: 5432
+          - source_labels: [__meta_kubernetes_pod_label_rucio_daemon]
+            action: replace
+            target_label: kubernetes_rucio_daemon
+
+
+      - job_name: 'rucio/nodes'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          regex: 'node-exporter'
+          action: keep
+
+      - job_name: 'rucio-test/node'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          regex: 'node-exporter'
+          action: keep
+

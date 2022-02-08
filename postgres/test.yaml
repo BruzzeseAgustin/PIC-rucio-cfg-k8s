@@ -2,24 +2,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rucio-postgresql
+  name: rucio-postgresql-2
   labels:
-    app: postgres
+    app: postgres-2
     tier: data
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: postgres-2
   template:
     metadata:
       labels:
-        app: postgres
+        app: postgres-2
         tier: data
     spec:
       nodeSelector:
-        # node: rucio
-        kubernetes.io/hostname: kube02
+        kubernetes.io/hostname: kube01
       volumes:
       - name: postgresdb
         persistentVolumeClaim:
@@ -27,6 +26,8 @@ spec:
       - name: pg-data
         emptyDir: {}
 
+      nodeSelector:
+        kubernetes.io/hostname: kube01
       containers:
       - name: postgres
         image: postgres:13.3
@@ -63,12 +64,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: rucio-postgresql
+  name: rucio-postgresql-2
 spec:
   type: ClusterIP
-  # type: NodePort
   selector:
-    app: postgres
+    app: postgres-2
   ports:
   - port: 5432
 

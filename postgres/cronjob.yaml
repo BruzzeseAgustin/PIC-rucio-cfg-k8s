@@ -15,15 +15,15 @@ spec:
       template:
         spec:
           nodeSelector:
-            node: rucio
+            kubernetes.io/hostname: kube02
           containers:
           - name: postgres
-            image: postgres:latest
+            image: postgres:13.3
             imagePullPolicy: IfNotPresent
             args:
             - /bin/bash 
             - -c
-            - echo "$(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB)" && pg_dump -Z9 -Fc -h $(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB) > $(RUCIO_DB_DUMP).`date +%Y-%m-%d-%H-%M`; find //rucio/ -size 0 | tr "\n" "\0" | xargs -0 rm --; find /rucio/ -type f -size -2M |  grep -v "/$" |  tr "\n" "\0" |  xargs -0 rm; ls -d -1 -tp /rucio/* | grep -v "/$" | tail -n +3 | tr "\n" "\0" | xargs -0 rm --; ls -l /rucio/
+            - echo "$(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB)" && pg_dump -Z9 -Fc -h $(RUCIO_DB_HOST) -U $(POSTGRES_USER) $(POSTGRES_DB) > $(RUCIO_DB_DUMP).`date +%Y-%m-%d-%H-%M`; ind /rucio/*.dump.* -size -838c | tr "\n" "\0" | xargs -0 rm --; find /rucio/ -type f -size -1M |  grep -v "/$" |  tr "\n" "\0" |  xargs -0 rm; ls -d -1 -tp /rucio/* | grep -v "/$" | tail -n +3 | tr "\n" "\0" | xargs -0 rm --; ls -l /rucio/
             volumeMounts:
             - mountPath: /rucio/
               name: postgresdb
@@ -36,7 +36,7 @@ spec:
                 memory: 4Gi
             env:
             - name: RUCIO_DB_HOST
-              value: rucio-db
+              value: rucio-postgresql
             - name: POSTGRES_DB
               value: rucio
             - name: POSTGRES_USER
@@ -51,4 +51,5 @@ spec:
             persistentVolumeClaim:
               claimName: rucio-psql-pvc
           restartPolicy: OnFailure
+
 

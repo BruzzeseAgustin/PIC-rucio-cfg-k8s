@@ -1,21 +1,19 @@
  apiVersion: v1
  kind: Pod
  metadata:
-   name: pic01-init-v1
+   name: init
    labels:
      app: rucio
-   namespace: prod-rucio-test
  spec:
    restartPolicy: Never
    containers:
      - name: init
-       # image: rucio/rucio-init:release-1.23.11_py3
-       image: rucio/rucio-init:release-1.26.9
+       image: rucio/rucio-init:release-1.26.0
        imagePullPolicy: IfNotPresent
        env:
          - name: RUCIO_CFG_DATABASE_DEFAULT
-           value: postgresql://rucio:secret@rucio-postgresql:5432/rucio
+           value: postgresql://rucio:secret@rucio-postgresql/rucio
          - name: RUCIO_CFG_DATABASE_SCHEMA
-           value: test
+           value: rucio
          - name: RUCIO_PRINT_CFG
            value: "true"

@@ -1,0 +1,10 @@
+FROM postgres:13.3
+
+RUN apt-get update &&\ 
+    	apt-get install openssh-server -y \
+	sshpass && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY deploy/db/init_ddl.sh /docker-entrypoint-initdb.d/
+RUN chmod +x /docker-entrypoint-initdb.d/init_ddl.sh
+

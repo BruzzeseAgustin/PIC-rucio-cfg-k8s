@@ -1,0 +1,24 @@
+﻿apiVersion: extensions/v1beta1
+kind: Ingress
+metadata: 
+  namespace: monitoring
+  annotations:
+    field.cattle.io/creatorId: u-z4emb6k4gj
+    field.cattle.io/ingressState: '{"cHJvbWV0aGV1cy9tb25pdG9yaW5nL3Byb21ldGhldXMubW9uaXRvcmluZy4xOTIuMTY4Ljk2Ljc3Lm5pcC5pby8vODA4MA==":""}'
+    field.cattle.io/publicEndpoints: '[{"addresses":["192.168.96.77"],"port":80,"protocol":"HTTP","serviceName":"monitoring:prometheus-service","ingressName":"monitoring:prometheus","hostname":"prometheus.monitoring.192.168.96.77.nip.io","allNodes":true}]'
+  creationTimestamp: null
+  generation: 1
+  labels:
+    cattle.io/creator: norman
+  name: prometheus
+  selfLink: /apis/extensions/v1beta1/namespaces/monitoring/ingresses/prometheus
+spec:
+  rules:
+  - host: prometheus.monitoring.192.168.96.77.nip.io
+    http:
+      paths:
+      - backend:
+          serviceName: prometheus-service
+          servicePort: 8080
+status:
+  loadBalancer: {}
