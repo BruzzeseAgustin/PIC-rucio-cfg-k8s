@@ -1,0 +1,12 @@
+[client]
+rucio_host = http://rucio-server-magic.k8s.pic.es
+auth_host = http://rucio-auth-magic.k8s.pic.es
+ca_cert = /etc/grid-security/certificates/5fca1cb1.0
+auth_type = userpass
+username = ddmlab
+password = secret
+account = root
+client_cert = /opt/rucio/etc/usercert.pem
+client_key = /opt/rucio/etc/userkey.pem
+client_x509_proxy = $X509_USER_PROXY
+request_retries = 3
