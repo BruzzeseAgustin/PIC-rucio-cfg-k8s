@@ -2,7 +2,7 @@ image:
   tag: release-${DAEMON_VERSION}
   pullPolicy: IfNotPresent
 
-automatixCount: 1
+automatixCount: 0
 abacusAccountCount: 3
 abacusRseCount: 3
 abacusCollectionReplicaCount: 3
@@ -409,82 +409,6 @@ additionalSecrets:
     mountPath: /usr/local/lib/python3.6/site-packages/rucio/daemons/hermes/
     subPaths: 
       - hermes2.py
-
-config:
-  database:
-    default: "postgresql://rucio:secret@rucio-postgresql:5432/rucio"
-    schema: "test"
-
-  messaging_hermes:
-    username: "admin"
-    password: "admin"
-    port: "32005"
-    nonssl_port: "32005"
-    use_ssl: "false"
-    destination: "/queue/events"
-    ssl_key_file: "/opt/x509/hostkey.pem"
-    ssl_cert_file: "/opt/x509/hostcert.pem"
-    brokers: "192.168.96.77:32005"
-    email_from: "bruzzese@pic.es"
-    email_test: "bruzzese@pic.es"
-
-  hermes:
-    elastic_endpoint: 'http://bulk:12345678@elk-jcasals.pic.es:9200/rucio/_bulk/'
-
-  messaging_hermes2:
-    elastic_endpoint: 'http://bulk:12345678@elk-jcasals.pic.es:9200/rucio/_bulk/'
-
-  tracer-kronos:
-    username: "admin"
-    password: "admin"
-    port: "32005"
-    nonssl_port: "32005"
-    brokers: "192.168.96.77"
-    use_ssl: "false"
-    ssl_key_file: "/opt/x509/hostkey.pem"
-    ssl_cert_file: "/opt/x509/hostcert.pem"
-    queue: "/queue/Consumer.kronos.rucio.tracer"
-    prefetch_size: "10"
-    chunksize: "10"
-    subscription_id: "rucio-tracer-listener"
-    reconnect_attempts: "100"
-    dataset_wait: "60"
-
-  conveyor:
-    scheme: "gsiftp,root,https,davs,srm,http"
-    transfertool: "fts3"
-    ftshosts: ${FTS_NAME}
-    ftsmonhosts: ${FTS_NAME}
-    cacert: "/opt/certs/ca.pem"
-    usercert: "/opt/proxy/x509up"
-    queue_mode: "strict"
-    user_deterministic_id: "True"
-
-  policy:
-    permission: "pic"
-    schema: "pic"
-    lfn2pfn_algorithm_default: "identity"
-
-  monitor:
-    carbon_server: "graphite-test.pic.es"
-    carbon_port: "2014"
-    user_scope: "rucio"
-    enable_metrics: "True"
-
-  trace:
-    username: "admin"
-    password: "admin"
-    port: "32005"
-    nonssl_port: "32005"
-    brokers: "192.168.96.77"
-    tracedir: "/var/log/rucio/trace"
-    topic: "/topic/rucio.tracer"
-
-  monitor:
-    carbon_server: "graphite-test.pic.es"
-    carbon_port: "2014"
-    user_scope: "rucio"
-    enable_metrics: "True"
 
 automaticRestart:
   enabled: 1

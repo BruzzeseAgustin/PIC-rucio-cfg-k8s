@@ -1,7 +1,8 @@
 [client]
-rucio_host = http://rucio-server-magic.k8s.pic.es
-auth_host = http://rucio-auth-magic.k8s.pic.es
-ca_cert = /etc/grid-security/certificates/5fca1cb1.0
+rucio_host = https://rucio-server-magic.k8s.pic.es
+auth_host = https://rucio-auth-magic.k8s.pic.es
+# ca_cert = /etc/grid-security/certificates/5fca1cb1.0
+ca_cert = /home/agus/K8s-production-test/config/docker/certs/grid-security/certificates/
 auth_type = userpass
 username = ddmlab
 password = secret

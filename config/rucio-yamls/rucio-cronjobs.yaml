@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-rucio-cronjobs-v1
+  labels:
+   app: test-rucio-cronjobs-v1
+spec:
+   initContainers:
+     - name: init-service
+       image: busybox:1.28
+       command: ['sh', '-c', "until nslookup ${RELEASE_NAME}-server-rucio-server; do echo waiting for rucio-server; sleep 2; done"]
+   containers:
+     - name: rucio-hermes2
+       image: bruzzese/rucio-cronjobs:${CLIENT_VERSION}
+       imagePullPolicy: IfNotPresent
+       command: ["/bin/bash"]
+       args: ["-c", "mkdir -p /opt/rucio/etc; source ~/.bashrc; /etc/profile.d/rucio_init.sh; cat /opt/rucio/etc/rucio.cfg; /opt/rucio/etc/hermes2.sh"]
+       env:
+       - name: RUCIO_CFG_RUCIO_HOST
+         value: https://${SERVER_HOST_NAME}:443
+       - name: RUCIO_CFG_AUTH_HOST
+         value: https://${AUTH_HOST_NAME}:443
+       - name: RUCIO_CFG_AUTH_TYPE
+         value: userpass
+       - name: RUCIO_CFG_USERNAME
+         value: ddmlab
+       - name: RUCIO_CFG_PASSWORD
+         value: secret
+       - name: RUCIO_CFG_ACCOUNT
+         value: root
+     - name: rucio-sync-rse
+       image: bruzzese/rucio-cronjobs:${CLIENT_VERSION}
+       imagePullPolicy: IfNotPresent
+       command: ["/bin/bash"]
+       args: ["-c", "mkdir -p /opt/rucio/etc; source ~/.bashrc; /etc/profile.d/rucio_init.sh; cat /opt/rucio/etc/rucio.cfg; python3 /opt/rucio/etc/sync-clients.py"]
+       env:
+       - name: RUCIO_CFG_RUCIO_HOST
+         value: https://${SERVER_HOST_NAME}:443
+       - name: RUCIO_CFG_AUTH_HOST
+         value: https://${AUTH_HOST_NAME}:443
+       - name: RUCIO_CFG_AUTH_TYPE
+         value: userpass
+       - name: RUCIO_CFG_USERNAME
+         value: ddmlab
+       - name: RUCIO_CFG_PASSWORD
+         value: secret
+       - name: RUCIO_CFG_ACCOUNT
+         value: root
+     - name: rucio-sync-client
+       image: bruzzese/rucio-cronjobs:${CLIENT_VERSION}
+       imagePullPolicy: IfNotPresent
+       command: ["/bin/bash"]
+       args: ["-c", "mkdir -p /opt/rucio/etc; source ~/.bashrc; /etc/profile.d/rucio_init.sh; cat /opt/rucio/etc/rucio.cfg; python3 /opt/rucio/etc/sync-rses.py"]
+       env:
+       - name: RUCIO_CFG_RUCIO_HOST
+         value: https://${SERVER_HOST_NAME}:443
+       - name: RUCIO_CFG_AUTH_HOST
+         value: https://${AUTH_HOST_NAME}:443
+       - name: RUCIO_CFG_AUTH_TYPE
+         value: userpass
+       - name: RUCIO_CFG_USERNAME
+         value: ddmlab
+       - name: RUCIO_CFG_PASSWORD
+         value: secret
+       - name: RUCIO_CFG_ACCOUNT
+         value: root
+   restartPolicy: Never

@@ -7,6 +7,13 @@
    namespace: bruzzese
  spec:
    restartPolicy: Never
+   initContainers:
+     - name: init-service
+       image: busybox:${BUSYBOX_VERSION}
+       command: ['sh', '-c', "until nslookup postgres; do echo waiting for servicedb; sleep 2; done"]
+     - name: init-mydb
+       image: busybox:${BUSYBOX_VERSION}
+       command: ['sh', '-c', "until nc -zvw1 rucio-postgresql 5432; do echo waiting for mydb; sleep 2; done"]
    containers:
      - name: init
        image: rucio/rucio-init:release-1.26.9
