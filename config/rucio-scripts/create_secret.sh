@@ -25,9 +25,9 @@ kubectl create secret generic ${SERVER_NAME}-auth-hostkey --from-file=hostkey.pe
 kubectl create secret generic ${SERVER_NAME}-auth-cafile --from-file=ca.pem=/$(pwd)/config/docker/certs/ca.pem
 kubectl create secret generic ${SERVER_NAME}-rucio-x509up --from-file=x509up=/$(pwd)/config/docker/proxy/x509
 kubectl create secret generic ${SERVER_NAME}-certs --from-file=/$(pwd)/config/docker/certs/ca.pem
-# envsubst < $(pwd)/config/rucio-cfg/rucio.cfg.server > $(pwd)/config/rucio-cfg/rucio.cfg && kubectl create secret generic ${SERVER_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg/rucio.cfg && rm -rf $(pwd)/config/rucio-cfg/rucio.cfg
+envsubst < $(pwd)/config/rucio-cfg/rucio.cfg.server > $(pwd)/config/rucio-cfg/rucio.cfg && kubectl create secret generic ${SERVER_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg/rucio.cfg && rm -rf $(pwd)/config/rucio-cfg/rucio.cfg
 
-kubectl create secret generic ${SERVER_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg-test/rucio.cfg.server 
+# kubectl create secret generic ${SERVER_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg-test/rucio.cfg.server 
 
 kubectl create secret generic ${DAEMON_NAME}-fts-cert --from-file=usercert=/$(pwd)/${DIR_CERTS}/hostcert.pem
 kubectl create secret generic ${DAEMON_NAME}-fts-key --from-file=userkey=/$(pwd)/${DIR_CERTS}/hostkey.pem
@@ -43,9 +43,9 @@ kubectl create secret generic ${DAEMON_NAME}-rucio-x509up-reaper --from-file=x50
 kubectl create secret generic ruciod-release-rucio-x509up --from-file=proxy-volume=/$(pwd)/config/docker/proxy/x509
 
 # this is a way to move around the issue with hermes2
-# envsubst < $(pwd)/config/rucio-cfg/rucio.cfg.daemons > $(pwd)/config/rucio-cfg/rucio.cfg && kubectl create secret generic ${DAEMON_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg/rucio.cfg 
+envsubst < $(pwd)/config/rucio-cfg/rucio.cfg.daemons > $(pwd)/config/rucio-cfg/rucio.cfg && kubectl create secret generic ${DAEMON_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg/rucio.cfg 
 
-kubectl create secret generic ${DAEMON_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg-test/rucio.cfg.daemons
+# kubectl create secret generic ${DAEMON_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg-test/rucio.cfg.daemons
  
 # Script to rotate logs in hermes2
 kubectl create secret generic ${DAEMON_NAME}-hermes2-script --from-file=hermes2.py=/$(pwd)/dependencies/hermes/hermes2.py

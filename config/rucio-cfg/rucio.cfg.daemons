@@ -17,8 +17,8 @@ logdir = /var/log/rucio
 loglevel = DEBUG
 mailtemplatedir = /opt/rucio/etc/mail_templates
 [database]
-default = postgresql://rucio:secret@rucio-postgresql/rucio
-schema = test
+default = postgresql://${DB_USER}:${DB_PASSWORD}@${DB_NAME}:5432/${DB_NAME}
+schema = ${RUCIO_CFG_DATABASE_SCHEMA}
 pool_reset_on_return = rollback
 echo = 0
 pool_recycle = 600
@@ -30,7 +30,7 @@ enable_metrics = True
 [policy]
 permission = generic
 schema = generic
-lfn2pfn_algorithm_default = identity
+lfn2pfn_algorithm_default = ${LFN2PFN_ALGORITHM}
 support = https://github.com/rucio/rucio/issues/
 support_rucio = https://github.com/rucio/rucio/issues/
 [automatix]
@@ -40,11 +40,11 @@ cache = /opt/rucio/auditor/cache
 [conveyor]
 scheme = gsiftp,root,https,davs,srm,http
 transfertool = fts3
-ftshosts = https://fts02.pic.es:8446,https://fts01.pic.es:8446
+ftshosts = ${FTS_NAME}
 cacert = /opt/certs/ca.pem
 usercert = /opt/proxy/x509up
 queue_mode = strict
-ftsmonhosts = https://fts02.pic.es:8446,https://fts01.pic.es:8446
+ftsmonhosts = ${FTS_NAME}
 [messaging-fts3]
 port = 61123
 ssl_key_file = /etc/grid-security/hostkey.pem
@@ -63,11 +63,11 @@ ssl_cert_file = /opt/x509/hostcert.pem
 destination = /queue/events
 brokers = 192.168.96.77:32005
 voname = atlas
-email_from = bruzzese@pic.es
-email_test = bruzzese@pic.es
+email_from = ${ADMIN_EMAIL}
+email_test = ${ADMIN_EMAIL}
 [hermes]
-elastic_endpoint = http://bulk:Bulk!Us3r@es.pic.es:9200/rucio/_bulk/
-elastic_server = http://bulk:Bulk!Us3r@es.pic.es:9200
+elastic_endpoint = ${ELK_BULK_NAME}
+elastic_server = ${ELK_NAME}
 elastic_index = rucio
 elastic_date_pattern = -%%Y.%%m.%%d
 [tracer-kronos]

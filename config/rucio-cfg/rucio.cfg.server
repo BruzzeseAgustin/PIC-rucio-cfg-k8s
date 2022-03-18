@@ -3,8 +3,8 @@ logdir = /var/log/rucio
 loglevel = DEBUG
 mailtemplatedir = /opt/rucio/etc/mail_templates
 [database]
-default = postgresql://rucio:secret@rucio-postgresql/rucio
-schema = test
+default = postgresql://${DB_USER}:${DB_PASSWORD}@${DB_NAME}:5432/${DB_NAME}
+schema = ${RUCIO_CFG_DATABASE_SCHEMA}
 pool_reset_on_return = rollback
 echo = 0
 pool_recycle = 600
@@ -25,9 +25,9 @@ brokers = localhost
 port = 61013
 topic = /topic/rucio.tracer
 [policy]
-permission = pic
-schema = pic
-lfn2pfn_algorithm_default = identity
+permission = ${PERMISSION_NAME}
+schema = ${SCHEMA_NAME}
+lfn2pfn_algorithm_default = ${LFN2PFN_ALGORITHM}
 support = https://github.com/rucio/rucio/issues/
 support_rucio = https://github.com/rucio/rucio/issues/
 [credentials]

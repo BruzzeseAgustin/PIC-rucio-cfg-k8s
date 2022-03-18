@@ -59,7 +59,7 @@ RUN chmod 777 /proxy.sh
 
 USER $USER
 WORKDIR $WDIR
-CMD ["/proxy.sh"]
-
+# CMD ["/proxy.sh"]
+ENTRYPOINT ["/proxy.sh"]
 
 

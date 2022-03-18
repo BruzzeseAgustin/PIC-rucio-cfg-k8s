@@ -64,4 +64,3 @@ spec:
          value: secret
        - name: RUCIO_CFG_ACCOUNT
          value: root
-   restartPolicy: Never

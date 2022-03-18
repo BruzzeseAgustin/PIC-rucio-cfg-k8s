@@ -1,13 +1,12 @@
 [client]
-rucio_host = https://rucio-server-magic.k8s.pic.es
-auth_host = https://rucio-auth-magic.k8s.pic.es
-# ca_cert = /etc/grid-security/certificates/5fca1cb1.0
-ca_cert = /home/agus/K8s-production-test/config/docker/certs/grid-security/certificates/
-auth_type = userpass
-username = ddmlab
-password = secret
-account = root
-client_cert = /opt/rucio/etc/usercert.pem
-client_key = /opt/rucio/etc/userkey.pem
-client_x509_proxy = $X509_USER_PROXY
-request_retries = 3
+rucio_host = {{ https://RUCIO_CFG_RUCIO_HOST | default('localhost') }}
+auth_host = {{ https://RUCIO_CFG_AUTH_HOST | default('localhost') }}
+ca_cert = {{ RUCIO_CFG_CA_CERT | default('/etc/pki/tls/certs/ca-bundle.crt') }}
+auth_type = {{ RUCIO_CFG_AUTH_TYPE | default('userpass') }}
+username = {{ RUCIO_CFG_USERNAME | default('ddmlab') }}
+password = {{ RUCIO_CFG_PASSWORD | default('secret') }}
+account = {{ RUCIO_CFG_ACCOUNT | default('root') }}
+client_cert = {{ RUCIO_CFG_CLIENT_CERT | default('') }}
+client_key = {{ RUCIO_CFG_CLIENT_KEY | default('') }}
+client_x509_proxy = {{ RUCIO_CFG_CLIENT_X509_PROXY | default('') }}
+request_retries = {{ RUCIO_CFG_REQUEST_RETRIES | default('3') }}
