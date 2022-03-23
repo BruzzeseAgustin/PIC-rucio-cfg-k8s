@@ -78,13 +78,16 @@ download_untar: ## Download dependencies for rucio services
 	sed -i 's/reaper/reaper2/g' $(shell pwd)/dependencies/rucio-daemons/templates/reaper2.yaml 
 	
 rucio_client:
+	# ensure you have install glib-2.0 
+	
 	pip install virtualenv
 	virtualenv rucio
 
+	envsubst < $(shell pwd)/config/rucio-cfg/rucio.cfg.client > $(shell pwd)/rucio/etc/rucio.cfg
+	. rucio/bin/activate; pip install -U pip cmake 
 	. rucio/bin/activate; pip install -Iv rucio-clients==$(CLIENT_VERSION)
-
-	cp $(shell pwd)/config/rucio-cfg/rucio.cfg.client $(shell pwd)/rucio/etc/rucio.cfg
-
+	. rucio/bin/activate; pip install -Iv gfal2-python
+	
 	export RUCIO_HOME=`pwd`/rucio/
 		
 # DOCKER TASKS
@@ -94,12 +97,9 @@ build: ## Build the Certs and Proxy container
 	echo 'y' | docker system prune; 
 	echo 'y' | docker image prune -a; 
 	
-	docker build --no-cache -f $(shell pwd)/config/docker/Dockerfile -t proxy-renew:1.0.0 $(shell pwd)/config/docker
-
-	@echo
-	@echo "$(ccyellow)> Setup PIC certs and proxy docker image $(ccend)"
-	@echo
-
+	rm -rf $(shell pwd)/config/docker/certs 
+	rm -rf $(shell pwd)/config/docker/proxy
+	
 	if [ ! -d $(shell pwd)/config/docker/certs ]; then \
 	  mkdir -p $(shell pwd)/config/docker/certs; \
 	fi
@@ -108,16 +108,26 @@ build: ## Build the Certs and Proxy container
 	  mkdir -p $(shell pwd)/config/docker/proxy; \
 	fi
 	
-	docker run --rm --net=host \
+	
+	docker build --no-cache -f $(shell pwd)/config/docker/Dockerfile -t proxy-renew:1.0.0 $(shell pwd)/config/docker
+
+	@echo
+	@echo "$(ccyellow)> Setup PIC certs and proxy docker image $(ccend)"
+	@echo
+
+	docker run --net=host \
 		--privileged=true \
 		-h $(shell hostname) \
 		--name proxy-renew \
-		-v $(shell pwd)/certs-k8s/hostcert.pem:/tmp/robotcert.pem \
-		-v $(shell pwd)/certs-k8s/hostkey.pem:/tmp/robotkey.pem \
+		-v $(shell pwd)/$(DIR_CERTS)/hostcert.pem:/tmp/robotcert.pem \
+		-v $(shell pwd)/$(DIR_CERTS)/hostkey.pem:/tmp/robotkey.pem \
 		-v $(shell pwd)/config/docker/certs:/tmp/certs \
 		-v $(shell pwd)/config/docker/proxy:/tmp/proxy \
-		proxy-renew:1.0.0 
-
+		proxy-renew:1.0.0
+	
+	sleep 5 
+	@echo finished 	
+		
 run_setup: ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
 
 	$(shell pwd)/config/rucio-scripts/create_secret.sh
@@ -128,9 +138,9 @@ run_setup: ## Run container with the variables placed at `config.env`, and gener
 	
 run_start: ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
 
-	envsubst < $(shell pwd)/config/rucio-yamls/rucio-server.yaml | helm install $(RELEASE_NAME)-server rucio/rucio-server -f -
-	envsubst < $(shell pwd)/config/rucio-yamls/rucio-daemons.yaml | helm install $(RELEASE_NAME)-daemons $(shell pwd)/dependencies/rucio-daemons -f -
-	envsubst < $(shell pwd)/config/rucio-yamls/rucio-ui.yaml | helm install $(RELEASE_NAME)-ui rucio/rucio-ui -f -
+	envsubst < $(shell pwd)/config/rucio-yamls/rucio-server.yaml | helm upgrade --install $(RELEASE_NAME)-server rucio/rucio-server -f -
+	envsubst < $(shell pwd)/config/rucio-yamls/rucio-daemons.yaml | helm upgrade --install $(RELEASE_NAME)-daemons $(shell pwd)/dependencies/rucio-daemons -f -
+	envsubst < $(shell pwd)/config/rucio-yamls/rucio-ui.yaml | helm upgrade --install $(RELEASE_NAME)-ui rucio/rucio-ui -f -
 	
 	kubectl create -f $(shell pwd)/config/rucio-yamls/rucio-ui-nodeport.yaml
 	kubectl create -f $(shell pwd)/config/rucio-yamls/rucio-client.yaml
@@ -156,8 +166,8 @@ uninstall:
 	# Delete dependencies
 	rm -rf $(shell pwd)/dependencies/rucio-daemons &
 	$(shell pwd)/config/rucio-scripts/delete_secret.sh &
-	rm -rf $(shell pwd)/config/docker/certs
-	rm -rf $(shell pwd)/config/docker/proxy
+	rm -rf $(shell pwd)/config/docker/certs &
+	rm -rf $(shell pwd)/config/docker/proxy & 
 	
 	# Delete rucio server, demons, and ui
 	helm delete $(RELEASE_NAME)-server &	

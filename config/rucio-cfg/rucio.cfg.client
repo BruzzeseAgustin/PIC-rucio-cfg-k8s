@@ -1,12 +1,20 @@
 [client]
-rucio_host = {{ https://RUCIO_CFG_RUCIO_HOST | default('localhost') }}
-auth_host = {{ https://RUCIO_CFG_AUTH_HOST | default('localhost') }}
-ca_cert = {{ RUCIO_CFG_CA_CERT | default('/etc/pki/tls/certs/ca-bundle.crt') }}
-auth_type = {{ RUCIO_CFG_AUTH_TYPE | default('userpass') }}
-username = {{ RUCIO_CFG_USERNAME | default('ddmlab') }}
-password = {{ RUCIO_CFG_PASSWORD | default('secret') }}
-account = {{ RUCIO_CFG_ACCOUNT | default('root') }}
-client_cert = {{ RUCIO_CFG_CLIENT_CERT | default('') }}
-client_key = {{ RUCIO_CFG_CLIENT_KEY | default('') }}
-client_x509_proxy = {{ RUCIO_CFG_CLIENT_X509_PROXY | default('') }}
-request_retries = {{ RUCIO_CFG_REQUEST_RETRIES | default('3') }}
+rucio_host = https://${SERVER_HOST_NAME}
+auth_host = https://${AUTH_HOST_NAME}
+ca_cert = ${DIR_CERTS}/grid-security/certificates/
+auth_type = userpass
+username = ${RUCIO_CFG_BOOTSTRAP_USERPASS_IDENTITY}
+password = ${RUCIO_CFG_BOOTSTRAP_USERPASS_PWD}
+account = root
+client_cert = /opt/rucio/etc/usercert.pem
+client_key = /opt/rucio/etc/userkey.pem
+client_x509_proxy = 
+request_retries = 3
+
+
+[policy]
+permission = generic
+schema = generic
+lfn2pfn_algorithm_default = hash
+support = https://github.com/rucio/rucio/issues/
+support_rucio = https://github.com/rucio/rucio/issues/

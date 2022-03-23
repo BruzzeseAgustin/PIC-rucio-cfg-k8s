@@ -11,7 +11,7 @@ conveyorPollerCount: 3
 conveyorFinisherCount: 3
 conveyorReceiverCount: 3
 conveyorThrottlerCount: 3
-darkReaperCount: 3
+darkReaperCount: 1
 hermesCount: 1
 hermes2Count: 2
 judgeCleanerCount: 3
@@ -21,8 +21,8 @@ judgeRepairerCount: 3
 tracerKronosCount: 1
 transmogrifierCount: 2
 undertakerCount: 1
-reaper2Count: 3
-reaperCount: 1
+reaper2Count: 1
+reaperCount: 3
 minosCount: 1
 necromancerCount: 1
 undertakerCount: 1

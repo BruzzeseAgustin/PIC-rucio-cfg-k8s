@@ -5,7 +5,7 @@ source /$(pwd)/deploy.env
 export DAEMON_NAME=$RELEASE_NAME-daemons
 export SERVER_NAME=$RELEASE_NAME-server
 export UI_NAME=$RELEASE_NAME-ui
-export DIR_CERTS=certs-k8s
+
 
 echo "Creating new secrets"
 if [ ! -f /$(pwd)/certs/robotcert.pem ] && [ -f /$(pwd)/certs/robotcert.pem ]; then
@@ -43,7 +43,7 @@ kubectl create secret generic ${DAEMON_NAME}-rucio-x509up-reaper --from-file=x50
 kubectl create secret generic ruciod-release-rucio-x509up --from-file=proxy-volume=/$(pwd)/config/docker/proxy/x509
 
 # this is a way to move around the issue with hermes2
-envsubst < $(pwd)/config/rucio-cfg/rucio.cfg.daemons > $(pwd)/config/rucio-cfg/rucio.cfg && kubectl create secret generic ${DAEMON_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg/rucio.cfg 
+envsubst < $(pwd)/config/rucio-cfg/rucio.cfg.daemons > $(pwd)/config/rucio-cfg/rucio.cfg && kubectl create secret generic ${DAEMON_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg/rucio.cfg && rm -rf $(pwd)/config/rucio-cfg/rucio.cfg
 
 # kubectl create secret generic ${DAEMON_NAME}-rucio-cfg --from-file=rucio.cfg=$(pwd)/config/rucio-cfg-test/rucio.cfg.daemons
  
@@ -75,13 +75,13 @@ kubectl create secret generic ${UI_NAME}-hostkey --from-file=hostkey.pem=/$(pwd)
 
 kubectl create secret generic ${UI_NAME}-cafile  --from-file=ca.pem=/$(pwd)/config/docker/certs/ca_full.pem
 kubectl create secret generic ${UI_NAME}-permission --from-file=pic.py=/$(pwd)/dependencies/permission/pic.py
-kubectl create secret generic ${UI_NAME}-schema --from-file=pic.py=/$(pwd)/dependencies/schema/pic.py
+kubectl create secret generic ${UI_NAME}-schema --from-file=pic.py=/$(pwd)/dependencies/schema/pic.py.1.26
 kubectl create secret generic ${UI_NAME}-base --from-file=base.js=/$(pwd)/dependencies/web/base.js
 kubectl create secret generic ${UI_NAME}-rucio --from-file=rucio.js=/$(pwd)/dependencies/web/rucio.js
 kubectl create secret generic ${UI_NAME}-web-ui --from-file=/$(pwd)/dependencies/web
 
 kubectl create secret generic ${SERVER_NAME}-rucio-ca-bundle --from-file=/$(pwd)/config/docker/certs/ca.pem
 kubectl create secret generic ${SERVER_NAME}-permission --from-file=pic.py=/$(pwd)/dependencies/permission/pic.py
-kubectl create secret generic ${SERVER_NAME}-schema --from-file=pic.py=/$(pwd)/dependencies/schema/pic.py
+kubectl create secret generic ${SERVER_NAME}-schema --from-file=pic.py=/$(pwd)/dependencies/schema/pic.py.1.26
 kubectl create secret generic ${SERVER_NAME}-mail-templates --from-file=/$(pwd)/dependencies/mail_templates
 

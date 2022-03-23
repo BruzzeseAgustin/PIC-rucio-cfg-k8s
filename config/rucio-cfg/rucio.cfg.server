@@ -1,6 +1,7 @@
 [common]
 logdir = /var/log/rucio
 loglevel = DEBUG
+extract_scope = ${EXTRACT_SCOPE}
 mailtemplatedir = /opt/rucio/etc/mail_templates
 [database]
 default = postgresql://${DB_USER}:${DB_PASSWORD}@${DB_NAME}:5432/${DB_NAME}
