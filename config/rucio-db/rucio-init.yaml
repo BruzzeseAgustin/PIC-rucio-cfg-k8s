@@ -4,7 +4,7 @@
    name: pic01-init-v1
    labels:
      app: rucio
-   namespace: bruzzese
+   namespace: ${K8S_NAMESPACE}
  spec:
    restartPolicy: Never
    initContainers:

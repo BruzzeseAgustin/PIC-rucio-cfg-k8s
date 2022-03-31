@@ -11,7 +11,7 @@ conveyorPollerCount: 3
 conveyorFinisherCount: 3
 conveyorReceiverCount: 3
 conveyorThrottlerCount: 3
-darkReaperCount: 1
+darkReaperCount: 0
 hermesCount: 1
 hermes2Count: 2
 judgeCleanerCount: 3
@@ -21,7 +21,7 @@ judgeRepairerCount: 3
 tracerKronosCount: 1
 transmogrifierCount: 2
 undertakerCount: 1
-reaper2Count: 1
+reaper2Count: 0
 reaperCount: 3
 minosCount: 1
 necromancerCount: 1
@@ -299,6 +299,7 @@ judgeInjector:
 
 ftsRenewal:
   enabled: 1
+  schedule: "12 */6 * * *"
   image:
     repository: rucio/fts-cron
     tag: latest

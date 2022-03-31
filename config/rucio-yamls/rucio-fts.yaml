@@ -1,0 +1,36 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: fts-renew
+  namespace: ${K8S_NAMESPACE}
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: bruzzese/fts-renew
+            env:
+            - name: ftsserver
+              value: "https://fts02.pic.es:8446"
+            command: ["/bin/bash"]
+            args: ["/fts/renew_fts_delegation.sh"]
+            volumeMounts:
+            - name: usercert
+              mountPath: /etc/grid-security/usercert.pem
+              subPath: usercert.pem
+            - name: userkey
+              mountPath: /etc/grid-security/userkey.pem
+              subPath: userkey.pem
+          restartPolicy: OnFailure
+          volumes:
+          - name: usercert
+            secret:
+              secretName: ${RELEASE_NAME}-server-cert
+              defaultMode: 0600
+          - name: userkey
+            secret:
+              secretName: ${RELEASE_NAME}-server-key
+              defaultMode: 0400

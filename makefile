@@ -6,10 +6,19 @@ ver ?= deploy.env
 include $(ver)
 export $(shell sed 's/=.*//' $(ver))
 
+get_magic: read_variables # Download magic's configuracion file
+	wget -O $(shell pwd)/config.env https://gitlab.pic.es/bruzzese/pic-rucio-cfg-k8s/-/raw/main/config.env
+	
+get_icfo: read_variables # Download icfo's configuracion file
+	wget -O $(shell pwd)/config.env https://gitlab.pic.es/bruzzese/pic-rucio-cfg-k8s-icfo/-/raw/icfo-v1.0.0/config.env
+	
+get_cta: read_variables # Download cta's configuracion file
+	wget -O $(shell pwd)/config.env https://gitlab.pic.es/bruzzese/pic-rucio-cfg-k8s-cta/-/raw/cta-v1.0.0/config.env
+
 cnf ?= config.env
 include $(cnf)
 export $(shell sed 's/=.*//' $(cnf))
-
+	
 DOCKER_TRACK_BUILD := | while read line ; do echo "$(shell date)| $$line" | tee -a $(shell pwd)/docker/docker-build.txt ; done;
 
 
@@ -51,7 +60,11 @@ base:
 	rm -rf $(shell pwd)/config/docker/certs
 	mkdir -pv $(shell pwd)/config/docker/certs
 	chmod 777 $(shell pwd)/config/docker/certs
-		
+
+read_variables:
+	# include $(config.env)
+	export $(shell sed 's/=.*//' config.env)
+			
 clean: base ## Remove and create result's folders
 
 	rm -rf dfs-$(shell hostname)
@@ -65,7 +78,7 @@ helm_install:
 helm_update: ## Download dependencies for helm rucio 
 	helm repo update rucio	
 	
-download_untar: ## Download dependencies for rucio services
+download_untar: read_variables ## Download dependencies for rucio services
 	@echo
 	@echo "$(ccyellow)> Download dependencies for rucio services at $(shell pwd)$(ccend)"
 	# Create folder with containing hadoop dependencies
@@ -92,8 +105,8 @@ rucio_client:
 		
 # DOCKER TASKS
 # Build the container
-build: ## Build the Certs and Proxy container 
-
+build: read_variables ## Build the Certs and Proxy container 
+	export $(shell sed 's/=.*//' config.env)
 	echo 'y' | docker system prune; 
 	echo 'y' | docker image prune -a; 
 	
@@ -121,23 +134,23 @@ build: ## Build the Certs and Proxy container
 		--name proxy-renew \
 		-v $(shell pwd)/$(DIR_CERTS)/hostcert.pem:/tmp/robotcert.pem \
 		-v $(shell pwd)/$(DIR_CERTS)/hostkey.pem:/tmp/robotkey.pem \
-		-v $(shell pwd)/config/docker/certs:/tmp/certs \
-		-v $(shell pwd)/config/docker/proxy:/tmp/proxy \
+		-v $(shell pwd)/$(DIR_CAS):/tmp/certs \
+		-v $(shell pwd)/$(DIR_PROXY):/tmp/proxy \
 		proxy-renew:1.0.0
 	
 	sleep 5 
 	@echo finished 	
-		
-run_setup: ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
-
-	$(shell pwd)/config/rucio-scripts/create_secret.sh
+	
+run_setup: read_variables ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
+	export $(shell sed 's/=.*//' config.env)
+	$(shell pwd)/config/rucio-scripts/create_secret.sh 
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-client.yaml | kubectl create -f - &
 	envsubst < $(shell pwd)/config/rucio-db/rucio-db.yaml | kubectl create -f - &
-	envsubst < $(shell pwd)/config/rucio-db/rucio-init.yaml | kubectl create -f - 
+	envsubst < $(shell pwd)/config/rucio-db/rucio-init.yaml | kubectl create -f - &
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-cronjobs.yaml | kubectl create -f - &
 	
-run_start: ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
-
+run_start: read_variables ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
+	export $(shell sed 's/=.*//' config.env)
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-server.yaml | helm upgrade --install $(RELEASE_NAME)-server rucio/rucio-server -f -
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-daemons.yaml | helm upgrade --install $(RELEASE_NAME)-daemons $(shell pwd)/dependencies/rucio-daemons -f -
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-ui.yaml | helm upgrade --install $(RELEASE_NAME)-ui rucio/rucio-ui -f -
@@ -145,16 +158,16 @@ run_start: ## Run container with the variables placed at `config.env`, and gener
 	kubectl create -f $(shell pwd)/config/rucio-yamls/rucio-ui-nodeport.yaml
 	kubectl create -f $(shell pwd)/config/rucio-yamls/rucio-client.yaml
 	
-run_update: ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
-
+run_update: read_variables ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
+	export $(shell sed 's/=.*//' config.env)
 	$(shell pwd)/config/rucio-scripts/delete_secret.sh
 	$(shell pwd)/config/rucio-scripts/create_secret.sh 
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-server.yaml | helm upgrade --install $(RELEASE_NAME)-server rucio/rucio-server -f - &
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-daemons.yaml | helm upgrade --install $(RELEASE_NAME)-daemons $(shell pwd)/dependencies/rucio-daemons -f - &
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-ui.yaml | helm upgrade --install $(RELEASE_NAME)-ui rucio/rucio-ui -f - &
 
-run_clean: ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
-	
+run_clean: read_variables ## Run container with the variables placed at `config.env`, and generate configured files based on the files provided
+	export $(shell sed 's/=.*//' config.env)	
 	helm delete $(RELEASE_NAME)-server 	
 	helm delete $(RELEASE_NAME)-daemons
 	helm delete $(RELEASE_NAME)-ui
@@ -162,7 +175,7 @@ run_clean: ## Run container with the variables placed at `config.env`, and gener
 	
 		
 uninstall: 
-
+	export $(shell sed 's/=.*//' config.env)
 	# Delete dependencies
 	rm -rf $(shell pwd)/dependencies/rucio-daemons &
 	$(shell pwd)/config/rucio-scripts/delete_secret.sh &
@@ -181,4 +194,7 @@ uninstall:
 	kubectl delete -f $(shell pwd)/config/rucio-yamls/rucio-client.yaml &
 	envsubst < $(shell pwd)/config/rucio-yamls/rucio-cronjobs.yaml | kubectl delete -f - &	
 test: # test
-	envsubst < $(shell pwd)/config/rucio-yamls/rucio-client.yaml | kubectl create -f - &
+	envsubst < $(shell pwd)/config/rucio-yamls/rucio-fts.yaml | kubectl delete -f - &
+	envsubst < $(shell pwd)/config/rucio-yamls/rucio-cronjobs.yaml | kubectl delete -f - &
+	envsubst < $(shell pwd)/config/rucio-yamls/rucio-fts.yaml | kubectl create -f - &
+	envsubst < $(shell pwd)/config/rucio-yamls/rucio-cronjobs.yaml | kubectl create -f - &

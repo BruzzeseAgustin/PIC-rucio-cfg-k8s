@@ -45,6 +45,15 @@ To deploy an example HDFS cluster, run:
   cd PIC-rucio-server-k8s
 ```
 
+get magic: read_variables # Download magic's configuracion file
+	wget -O $(shell pwd)/config.env https://gitlab.pic.es/bruzzese/pic-rucio-cfg-k8s/-/raw/main/config.env
+	
+get_icfo: read_variables # Download icfo's configuracion file
+	wget -O $(shell pwd)/config.env https://gitlab.pic.es/bruzzese/pic-rucio-cfg-k8s-icfo/-/raw/icfo-v1.0.0/config.env
+	
+get_cta: read_variables # Download cta's configuracion file
+	wget -O $(shell pwd)/config.env https://gitlab.pic.es/bruzzese/pic-rucio-cfg-k8s-cta/-/raw/cta-v1.0.0/config.env
+	
 ```
   make download_untar 
   make build 
