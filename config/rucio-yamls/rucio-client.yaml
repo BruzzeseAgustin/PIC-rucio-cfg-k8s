@@ -25,12 +25,12 @@ data:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: client
+  name: client-2
   labels:
-    app: client
+    app: client-2
 spec:
   containers:
-  - name: client
+  - name: client-2
     image: rucio/rucio-clients:release-1.26.9
     volumeMounts:
     - name: usercert

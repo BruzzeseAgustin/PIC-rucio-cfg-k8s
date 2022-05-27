@@ -150,7 +150,7 @@ undertaker:
 conveyorTransferSubmitter:
   threads: 1
   sleepTime: 10
-  groupBulk: 100
+  groupBulk: 500
   activities: "'Analysis Input' 'Analysis Output' 'Data Brokering' 'Data Consolidation' 'Data rebalancing' 'Debug' 'Express' 'Functional Test' 'Group Subscriptions' 'Production Input' 'Production Output' 'Recovery' 'Staging' 'T0 Export' 'T0 Export' 'T0 Tape' 'User Subscriptions' 'default'"
   resources:
     requests:
@@ -195,8 +195,8 @@ conveyorReceiver:
   threads: 2
   resources:
     limits:
-      memory: "500Mi"
-      cpu: "500m"
+      memory: "300Mi"
+      cpu: "300m"
     requests:
       memory: "200Mi"
       cpu: "200m"
@@ -216,8 +216,8 @@ darkReaper:
   includeRses: "(type=CALIBDISK|type=DATADISK|type=GROUPDISK|type=LOCALGROUPDISK|type=SCRATCHDISK)"
   resources:
     limits:
-      memory: "700Mi"
-      cpu: "500m"
+      memory: "300Mi"
+      cpu: "300m"
     requests:
       memory: "200Mi"
       cpu: "300m"
@@ -263,10 +263,10 @@ hermes2:
   resources:
     limits:
       memory: "200Mi"
-      cpu: "700m"
+      cpu: "300m"
     requests:
       memory: "200Mi"
-      cpu: "700m"
+      cpu: "250m"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8080"
@@ -314,9 +314,9 @@ transmogrifierResources:
 tracerKronos:
   resources:
     limits:
-      cpu: 3000m 
+      cpu: 300m 
     requests:
-      cpu: 1000m 
+      cpu: 250m 
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8080"
@@ -335,11 +335,11 @@ judgeCleaner:
   threads: 2
   resources:
     limits:
-      cpu: 3750m 
-      memory: 4000Mi
+      cpu: 350m 
+      memory: 2000Mi
     requests:
-      cpu: 750m 
-      memory: 400Mi
+      cpu: 350m 
+      memory: 200Mi
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8080"
@@ -362,7 +362,7 @@ minos:
   resources:
     limits:
       memory: "200Mi"
-      cpu: "700m"
+      cpu: "350m"
     requests:
       memory: "100Mi"
       cpu: "100m"
@@ -375,7 +375,7 @@ minosTemporaryExpiration:
   resources:
     limits:
       memory: "200Mi"
-      cpu: "700m"
+      cpu: "350m"
     requests:
       memory: "100Mi"
       cpu: "100m"
@@ -387,7 +387,7 @@ necromancer:
   resources:
     limits:
       memory: "200Mi"
-      cpu: "700m"
+      cpu: "350m"
     requests:
       memory: "100Mi"
       cpu: "100m"

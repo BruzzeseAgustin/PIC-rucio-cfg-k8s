@@ -21,7 +21,7 @@ spec:
       volumes:
       - name: postgresdb
         persistentVolumeClaim:
-          claimName: psql-test
+          claimName: ${DB_PVC_NAME}
 
       containers:
       - name: postgres
@@ -37,19 +37,17 @@ spec:
 
         volumeMounts:
         - name: postgresdb
-          mountPath: /mnt/postgresql/pgdata
+          mountPath: /mnt/postgres/data
           
         env:
         - name: POSTGRES_DB
           value: rucio-postgresql
         - name: PGDATA
-          value: /var/lib/postgresql/data
+          value: /mnt/postgres/data/pgdata
         - name: POSTGRES_USER
           value: rucio
         - name: POSTGRES_PASSWORD
           value: secret
-        - name: RUCIO_DB_DUMP
-          value: /rucio/rucio-db.dump
 
         ports:
         - containerPort: 5432 

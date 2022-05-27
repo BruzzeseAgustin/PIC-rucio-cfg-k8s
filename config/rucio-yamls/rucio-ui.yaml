@@ -53,9 +53,9 @@ apache:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  ingressClassName: ${NGINX_NAME}
   path: /
   hosts:
     - ${UI_HOST_NAME}

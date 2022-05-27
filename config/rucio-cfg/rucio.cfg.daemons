@@ -70,6 +70,7 @@ elastic_endpoint = ${ELK_BULK_NAME}
 elastic_server = ${ELK_NAME}
 elastic_index = rucio
 elastic_date_pattern = -%%Y.%%m.%%d
+elastic_experiment = ${RELEASE_NAME}
 [tracer-kronos]
 brokers= atlas-test-mb.cern.ch
 port= 61013

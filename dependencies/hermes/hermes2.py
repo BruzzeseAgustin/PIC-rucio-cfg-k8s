@@ -313,6 +313,9 @@ def submit_to_elastic(messages, endpoint, prepend_str):
     """
     text = ''
     for message in messages:
+        elastic_experiment= config_get('hermes', 'elastic_experiment', False, None)
+        print(elastic_experiment)
+        message['experiment'] = elastic_experiment
         services = message['services']
         if services and 'elastic' not in services.split(','):
             continue
@@ -320,6 +323,9 @@ def submit_to_elastic(messages, endpoint, prepend_str):
     # res = requests.post(endpoint, data=text, headers={'Content-Type': 'application/json'})
     # return res.status_code
 
+    print()
+    print(text)
+    print(type(text))
     # Set empty date
     elastic_date = ""
     # Get elastic_server name from config - "http://$hostname:9200"

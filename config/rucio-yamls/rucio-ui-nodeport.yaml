@@ -4,7 +4,7 @@ metadata:
   labels:
     apps: rucio-ui-service
   name: rucio-ui-service
-  namespace: bruzzese
+  namespace: ${K8S_NAMESPACE}
 spec:
   ports:
   - name: rucio-ui-port
